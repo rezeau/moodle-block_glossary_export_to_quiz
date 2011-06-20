@@ -1,29 +1,29 @@
-23:17 29/01/2011
+23:18 29/01/2011
 --------------------------------------
-How to install on a moodle 1.9.x site.
+How to install on a moodle 2.0 site.
 --------------------------------------
 
 1.- Unzip the zip archive you downloaded from github to your local computer.
-2.- This will give you a folder named something like "rezeau-moodle19_block_glossary_export_to_quiz-ff8c6a1". The end of the name may vary.
+2.- This will give you a folder named something like "rezeau-moodle20_block_glossary_export_to_quiz-ff8c6a1". The end of the name may vary.
 3.- ***Rename*** that folder to "glossary_export_to_quiz".
-4.- Upload the block_glossary_export_to_quiz folder to your moodle /blocks/ folder.
+4.- Upload the "glossary_export_to_quiz" folder to your moodle/blocks/ folder.
 5.- Visit your Admin/Notifications page so that the block gets installed. This does not create any tables in your moodle database, just a version reference.
 
----------------------------------------------------------
-HOW TO USE block Export Glossary to Quiz for Moodle 1.9.x
----------------------------------------------------------
+-------------------------------------------------------
+HOW TO USE block Export Glossary to Quiz for Moodle 2.0
+-------------------------------------------------------
 
 A. Export from Glossary to moodle quiz XML file
 ***********************************************
 
-   1. You don't need to be in Edit mode to configure the Export Glossary to Quiz block. Just click on the Configuration icon.
+   1. Go into Edit mode and click on the Configuration icon to configure the Export_Glossary_to_Quiz block.
 
    2. Use the dropdown list to select the glossary that you want to use to export its entries to the quiz questions bank. If that glossary contains categories, you can select only one category to export its entries. To cancel your choice or to reset the block, simply leave the dropdown list on the Choose... position. 
 
    3. Maximum number of entries to export. Leave empty to export all entries from selected Glossary or Category. This option can be useful for exporting a limited number of entries from very large glossaries.
  
    4. Glossary entries can be exported to the Quiz Questions bank either as multiple choice or short answer questions.
-   Multiple choice questions will consist of the following elements:
+Multiple choice questions will consist of the following elements:
     * question text = glossary entry definition
     * correct answer = glossary entry concept
     * distracters = 3 glossary entry concepts randomly selected from the glossary (or glossary category) that you have selected.
