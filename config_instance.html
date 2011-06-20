@@ -1,0 +1,78 @@
+<?php
+   if (!isset($this->config->sortorder)) {
+       $this->config->sortorder = 0;
+   }
+   if (!isset($this->config->questiontype)) {
+       $this->config->questiontype = 0; // 
+   }
+   if (!isset($this->config->glossary)) {
+       $this->config->glossary = '';
+   }
+?>
+
+<table cellpadding="4" cellspacing="0">
+<tr valign="top">
+	<td align="right">
+		<?php 
+			print_string("selectglossary","block_glossary_export_to_quiz");
+			helpbutton('selectglossary', get_string("selectglossary","block_glossary_export_to_quiz"), 'block_glossary_export_to_quiz');		
+		?>
+	</td> 
+	<td>
+		<?php
+			choose_from_menu_nested($categoriesarray,"glossary",$selected='',$nothing='choose',$script = '',
+        		$nothingvalue=0,$return=false,$disabled=false,$tabindex=0);
+		?>
+	</td>
+</tr>
+<tr valign="top">
+	<td align="right">
+		<?php 
+			print_string("sortorder","block_glossary_export_to_quiz"); 
+			helpbutton('sortorder', get_string("sortorder","block_glossary_export_to_quiz"), 'block_glossary_export_to_quiz');
+		?>
+	</td>
+	<td>
+		<?php
+     		choose_from_menu($sortorder, "sortorder", $this->config->sortorder, "");
+    	 ?>
+	</td>
+</tr> 
+
+<tr valign="top">
+	<td align="right">
+		<?php 
+			print_string("limitnum","block_glossary_export_to_quiz");
+			helpbutton('limitnum', get_string("limitnum","block_glossary_export_to_quiz"), 'block_glossary_export_to_quiz');
+		?>
+	</td>
+	<td>
+		<input type="text" name="limitnum" size="5" value="" />
+	</td>
+</tr>
+<tr valign="top">
+	<td align="right">
+		<?php
+			print_string("questiontype","block_glossary_export_to_quiz");
+     		helpbutton('questiontype', get_string("questiontype","block_glossary_export_to_quiz"), 'block_glossary_export_to_quiz');
+		?>
+	</td>
+	<td>	
+		<?php	
+            choose_from_menu($questiontype, "questiontype", $this->config->questiontype, "");
+		?>
+	</td>
+</tr>
+<tr valign="top">
+	<td align="right">&nbsp;</td>
+	<td><input type="submit" value="<?php print_string('savechanges') ?>" /></td>
+</tr>
+<tr>
+	<td align="right">&nbsp;</td>
+	<td>
+	<?php
+		echo ('<h5>'.get_string('block').' '.get_string('blockname','block_glossary_export_to_quiz').' - '.get_string('version').' '.$this->version).'</h5>';
+	?>
+	</td>
+</tr>
+</table>
