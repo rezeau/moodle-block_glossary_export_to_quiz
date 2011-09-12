@@ -111,8 +111,6 @@
 		foreach ($entries as $entry) {
     		$counter++;
             $definition = trusttext_strip($entry->definition);
-            //add nolink pending fix of bug    * MDL-24996 Turning off a filter in activity context doesn't work 
-            $definition = '<nolink>'.$definition.'</nolink>';
             $concept = trusttext_strip($entry->concept);
         	$expout .= "\n\n<!-- question: $counter  -->\n";            
     		$name_text = writetext( $concept );
@@ -125,15 +123,6 @@
             $expout .= "    </questiontext>\n";
 
 		if ($questiontype == 'multichoice') {
-                /// you can un-comment some of the following lines if you need those settings for your imported questions...
-                // $expout .= "    <generalfeedback></generalfeedback>\n";
-                // $expout .= "    <defaultgrade>1.0000000</defaultgrade>\n";
-                // $expout .= "    <penalty>0.1000000</penalty>\n";
-                // $expout .= "    <hidden>0</hidden>\n";
-                // $expout .= "    <single>true</single>\n";                
-                // $expout .= "    <correctfeedback></correctfeedback>\n";
-                // $expout .= "    <partiallycorrectfeedback></partiallycorrectfeedback>\n";
-                // $expout .= "    <incorrectfeedback></incorrectfeedback>\n";
                 $expout .= "    <shuffleanswers>true</shuffleanswers>\n";
                 $expout .= "    <answernumbering>".$answernumbering."</answernumbering>\n";
                 $concepts2 = $concepts;
@@ -147,8 +136,6 @@
                     if ($i === 0) {
                         $percent = 100;
                         $expout .= "      <answer fraction=\"$percent\">\n";
-                        // remove nolink moodle 2?
-                        $concept = '<nolink>'.$concept.'</nolink>';
                         $expout .= writetext( $concept,3,false )."\n";
                         $expout .= "      <feedback>\n";
                         $expout .= "      <text>\n";
@@ -158,8 +145,6 @@
                     } else {
                         $percent = 0;
                         $distracter = $concepts2[$rand_keys[$i-1]];
-                        // remove nolink moodle 2?
-                        $distracter = '<nolink>'.$distracter.'</nolink>';
                         $expout .= "      <answer fraction=\"$percent\">\n";
                         $expout .= writetext( $distracter,3,false )."\n";
                         $expout .= "      <feedback>\n";
