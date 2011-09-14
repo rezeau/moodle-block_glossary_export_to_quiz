@@ -41,10 +41,13 @@ $strglossary = get_string("modulename", "glossary");
 $strexportfile = get_string("exportfile", "glossary");
 $strexportentries = get_string('exportentriestoxml', 'block_glossary_export_to_quiz');
 
-$PAGE->set_url('/blocks/block_glossary_export_to_quiz/export_to_quiz.php.php', array('id'=>$cm->id));
+// not needed here
+/*
+$PAGE->set_url('/blocks/block_glossary_export_to_quiz/export_to_quiz.php', array('id'=>$cm->id));
 $PAGE->navbar->add($strexportentries);
 $PAGE->set_title(format_string($glossary->name));
 $PAGE->set_heading($course->fullname);
+*/
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($strexportentries);
