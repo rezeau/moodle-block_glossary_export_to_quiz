@@ -1,11 +1,17 @@
-16:55 16/07/2011
+13/09/2011 23:03:37
 --------------------------------------
 How to install on a moodle 2.0 site.
 --------------------------------------
-
+If you downloaded this zip archive from the new moodle.org plugins page
+1.- Unzip the zip archive to your local computer.
+2.- This will give you a folder named "glossary_export_to_quiz".
+3.- GO TO STEP 4 below
+---
+If you downloaded this zip archive from https://github.com/rezeau
 1.- Unzip the zip archive you downloaded from github to your local computer.
 2.- This will give you a folder named something like "rezeau-moodle20_block_glossary_export_to_quiz-ff8c6a1". The end of the name may vary.
 3.- ***Rename*** that folder to "glossary_export_to_quiz".
+---
 4.- Upload the "glossary_export_to_quiz" folder to your moodle/blocks/ folder.
 5.- Visit your Admin/Notifications page so that the block gets installed. This does not create any tables in your moodle database, just a version reference.
 
