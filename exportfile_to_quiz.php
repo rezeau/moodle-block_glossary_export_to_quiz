@@ -95,7 +95,8 @@
            $expout .= "        $categorypath\n";
            $expout .= "    </category>\n";
            $expout .= "  </question>\n";        
-    	
+    	$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+           
     if ( $entries = $DB->get_records_sql($sql) ) {
         $questiontype_params = explode("_", $questiontype);
     	$questiontype = $questiontype_params[0];
@@ -111,15 +112,17 @@
 		foreach ($entries as $entry) {
     		$counter++;
             $definition = trusttext_strip($entry->definition);
+            $fs = get_file_storage();            
+            $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
             $concept = trusttext_strip($entry->concept);
         	$expout .= "\n\n<!-- question: $counter  -->\n";            
     		$name_text = writetext( $concept );
             $qtformat = "html";
-            $question_text = writetext( $definition );
             $expout .= "  <question type=\"$questiontype\">\n";
             $expout .= "    <name>$name_text</name>\n";
             $expout .= "    <questiontext format=\"$qtformat\">\n";
-            $expout .= $question_text;
+            $expout .= writetext( $definition );;
+            $expout .= writefiles($entryfiles);
             $expout .= "    </questiontext>\n";
 
 		if ($questiontype == 'multichoice') {
@@ -180,23 +183,6 @@
 	
 	send_file($content, $filename, 0, 0, true, true);    
 	
-/*	/// functions below copied from question format.php
-	    function writetext( $raw, $ilev=0, $short=true) {
-        $indent = str_repeat( "  ",$ilev );
-
-        // if required add CDATA tags
-        if (!empty($raw) and (htmlspecialchars($raw)!=$raw)) {
-            $raw = "<![CDATA[$raw]]>";
-        }
-        if ($short) {
-            $xml = "$indent<text>$raw</text>\n";
-        }
-        else {
-            $xml = "$indent<text>\n$raw\n$indent</text>\n";
-        }
-        return $xml;
-    }
-*/
     /**
      * generates <text></text> tags, processing raw text therein
      * @param int ilev the current indent level
@@ -219,7 +205,23 @@
 
         return $xml;
     }
-	
+
+    function writefiles($files, $encoding='base64') {
+        if (empty($files)) {
+            return '';
+        }
+        $string = '';
+        foreach ($files as $file) {
+            if ($file->is_directory()) {
+                continue;
+            }
+            $string .= '<file name="' . $file->get_filename() . '" encoding="' . $encoding . '">';
+            $string .= base64_encode($file->get_content());
+            $string .= '</file>';
+        }
+        return $string;
+    }
+    
 	function xmltidy( $content ) {
         // can only do this if tidy is installed
         if (extension_loaded('tidy')) {
