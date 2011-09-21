@@ -22,16 +22,16 @@ $string['questiontype'] = 'Question type:';
 $string['questiontype_help'] = 'Glossary entries can be exported to the Quiz Questions bank either as multiple choice or short answer questions.
 Multiple choice questions will consist of the following elements:
 
-    * question text = glossary entry definition
-    * correct answer = glossary entry concept
-    * distracters = 3 glossary entry concepts randomly selected from the glossary (or glossary category) that you have selected.
+* question text = glossary entry definition
+* correct answer = glossary entry concept
+* distracters = 3 glossary entry concepts randomly selected from the glossary (or glossary category) that you have selected.
 
 Short answer questions
 
-    * Case insensitive. Student responses will be accepted as correct regardless of the original glossary entry concept case (uppercase or lowercase).
-          o Example: original entry "Moodle". Accepted correct responses: "Moodle", "moodle".
-    * Case sensitive. Student responses will be only be accepted as correct it the case of the original glossary entry concept is used..
-          o Example: original entry "Moodle". Accepted correct response: "Moodle".';
+* Case insensitive. Student responses will be accepted as correct regardless of the original glossary entry concept case (uppercase or lowercase).
+** Example: original entry "Moodle". Accepted correct responses: "Moodle", "moodle".
+* Case sensitive. Student responses will be only be accepted as correct it the case of the original glossary entry concept is used..
+** Example: original entry "Moodle". Accepted correct response: "Moodle".';
 $string['random'] = 'Randomly';
 $string['selectglossary'] = 'Select glossary to export from';
 $string['selectglossary_help'] = 'Use the dropdown list to select the glossary that you want to use to export its entries to the quiz questions bank. 

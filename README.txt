@@ -1,7 +1,7 @@
-13/09/2011 23:03:37
---------------------------------------
-How to install on a moodle 2.0 site.
---------------------------------------
+21/09/2011 11:13:31
+-------------------------------------------
+How to install on a moodle 2.0 or 2.1 site.
+-------------------------------------------
 If you downloaded this zip archive from the new moodle.org plugins page
 1.- Unzip the zip archive to your local computer.
 2.- This will give you a folder named "glossary_export_to_quiz".
@@ -15,9 +15,9 @@ If you downloaded this zip archive from https://github.com/rezeau
 4.- Upload the "glossary_export_to_quiz" folder to your moodle/blocks/ folder.
 5.- Visit your Admin/Notifications page so that the block gets installed. This does not create any tables in your moodle database, just a version reference.
 
--------------------------------------------------------
-HOW TO USE block Export Glossary to Quiz for Moodle 2.0
--------------------------------------------------------
+--------------------------------------------------------------
+HOW TO USE block Export Glossary to Quiz for Moodle 2.0 or 2.1
+--------------------------------------------------------------
 
 A. Export from Glossary to moodle quiz XML file
 ***********************************************
@@ -87,6 +87,12 @@ B. Import to the quiz questions bank
    9. You can use the SHORTANSWER or the MULTICHOICE questions in a quiz.
 
   10. You can use the SHORTANSWER questions to create one or more Random Short-Answer MATCHING questions.
+  Note.- At the time of writing, the Random Short-Answer MATCHING question type is working in Moodle 2.0 but not working in Moodle 2.1.
+  
+-----------
+ONLINE HELP
+-----------
+Online help is available when editing the block. Unfortunately, due to bug MDL-26072, in Moodle 2.0 the Help text is displayed inside the window, instead of in a popup as it does in Moodle 2.1.   
 
 Enjoy!
 --------------------------

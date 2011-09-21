@@ -83,7 +83,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
 		        // and select sortorder types to put in dropdown box
 		        
 		        // help icons removed pending fix of  
-		        //$mform->addHelpButton('selectglossary', 'selectglossary', 'block_glossary_export_to_quiz');
+		        $mform->addHelpButton('selectglossary', 'selectglossary', 'block_glossary_export_to_quiz');
 		        $types = array(
 		            0 => get_string('concept','block_glossary_export_to_quiz'),
 		            1 => get_string('lastmodified','block_glossary_export_to_quiz'),
@@ -91,9 +91,9 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
 		            3 => get_string('random','block_glossary_export_to_quiz')
 		        );
 		        $mform->addElement('select', 'config_sortingorder', get_string('sortingorder', 'block_glossary_export_to_quiz'), $types);
-		        //$mform->addHelpButton('config_sortingorder', 'sortingorder', 'block_glossary_export_to_quiz');
+		        $mform->addHelpButton('config_sortingorder', 'sortingorder', 'block_glossary_export_to_quiz');
 		        $mform->addElement('text', 'config_limitnum', get_string('limitnum', 'block_glossary_export_to_quiz'), array('size' => 5));
-                //$mform->addHelpButton('config_limitnum', 'limitnum', 'block_glossary_export_to_quiz');
+                $mform->addHelpButton('config_limitnum', 'limitnum', 'block_glossary_export_to_quiz');
 		        $mform->setDefault('config_limitnum', 0);
 		        $mform->setType('config_limitnum', PARAM_INTEGER);
 		
@@ -107,7 +107,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
 		            5 => get_string('shortanswer_1','block_glossary_export_to_quiz')
 		        );
 		        $mform->addElement('select', 'config_questiontype', get_string('questiontype', 'block_glossary_export_to_quiz'), $types);
-                //$mform->addHelpButton('config_questiontype', 'questiontype', 'block_glossary_export_to_quiz');
+                $mform->addHelpButton('config_questiontype', 'questiontype', 'block_glossary_export_to_quiz');
 	        }
         }
     }
