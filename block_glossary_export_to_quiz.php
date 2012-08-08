@@ -2,13 +2,21 @@
 
 class block_glossary_export_to_quiz extends block_base {
     function init() {
+        global $SESSION;
         $this->title = get_string('pluginname','block_glossary_export_to_quiz');
-        $SESSION->block_glossary_export_to_quiz->status = '';
     }
 
     function specialization() {
         global $CFG, $DB, $OUTPUT, $PAGE;
-        $this->config->title = get_string('pluginname','block_glossary_export_to_quiz');
+        require_once($CFG->libdir . '/filelib.php');
+        //$this->config->title = get_string('pluginname','block_glossary_export_to_quiz');
+        // load userdefined title and make sure it's never empty
+        if (empty($this->config->title)) {
+            $this->title = get_string('pluginname','block_glossary_export_to_quiz');
+        } else {
+            $this->title = $this->config->title;
+        }
+        
         $course = $this->page->course;
         $this->course = $course;
     }
@@ -22,7 +30,7 @@ class block_glossary_export_to_quiz extends block_base {
     function get_content() {
         global $USER, $CFG, $DB, $PAGE, $SESSION;
         $editing = $PAGE->user_is_editing();
-
+        $this->content = new stdClass();
         // set view block permission to course:mod/glossary:export to prevent students etc to view this block
         $course = $this->page->course; 
         $context = get_context_instance(CONTEXT_COURSE, $course->id);
@@ -39,10 +47,9 @@ class block_glossary_export_to_quiz extends block_base {
             $this->content->footer = '';
             return $this->content;
         }
-        
-        if (empty($this->config->glossary) || empty($SESSION->block_glossary_export_to_quiz->status) ) {
+        if (empty($this->config->glossary) || empty($SESSION->block_glossary_export_to_quiz->status) ) {   
             if ($editing) {
-                $this->content->text   = get_string('notyetconfiguredediting','block_glossary_export_to_quiz');
+                    $this->content->text   = get_string('notyetconfiguredediting','block_glossary_export_to_quiz');
         	} else {
                 $this->content->text   = get_string('notyetconfigured','block_glossary_export_to_quiz');
         	} 

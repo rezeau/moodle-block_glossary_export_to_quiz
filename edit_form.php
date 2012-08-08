@@ -32,6 +32,7 @@
 class block_glossary_export_to_quiz_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
         global $DB, $SESSION;
+        $SESSION->block_glossary_export_to_quiz->status = new stdClass();
         $SESSION->block_glossary_export_to_quiz->status = 'defined';
         // Fields for editing HTML block title and contents.
 
