@@ -1,6 +1,6 @@
-25/09/2011 10:08:33
+11:59 13/08/2012
 -------------------------------------------
-How to install on a moodle 2.0 or 2.1 site.
+How to install on a moodle 2.2 or 2.3 site.
 -------------------------------------------
 If you downloaded this zip archive from the new moodle.org plugins page
 1.- Unzip the zip archive to your local computer.
@@ -9,14 +9,14 @@ If you downloaded this zip archive from the new moodle.org plugins page
 ---
 If you downloaded this zip archive from https://github.com/rezeau
 1.- Unzip the zip archive you downloaded from github to your local computer.
-2.- This will give you a folder named something like "rezeau-moodle-block_glossary_export_to_quiz-ff8c6a1". The end of the name may vary.
+2.- This will give you a folder named something like "rezeau-moodle-block_glossary_export_to_quiz-xxyyzzz". The end of the name may vary.
 3.- ***Rename*** that folder to "glossary_export_to_quiz".
 ---
 4.- Upload the "glossary_export_to_quiz" folder to your moodle/blocks/ folder.
 5.- Visit your Admin/Notifications page so that the block gets installed. This does not create any tables in your moodle database, just a version reference.
 
 --------------------------------------------------------------
-HOW TO USE block Export Glossary to Quiz for Moodle 2.0 or 2.1
+HOW TO USE block Export Glossary to Quiz for Moodle 2.2 or 2.3
 --------------------------------------------------------------
 
 A. Export from Glossary to moodle quiz XML file
@@ -92,7 +92,7 @@ B. Import to the quiz questions bank
 -----------
 ONLINE HELP
 -----------
-Online help is available when editing the block. Unfortunately, due to bug MDL-26072, in Moodle 2.0 the Help text is displayed inside the window, instead of in a popup as it does in Moodle 2.1.   
+Online help is available when editing the block.
 
 Enjoy!
 --------------------------
