@@ -15,16 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Glossary random block caps.
  *
- * @package    block
- * @subpackage glossary_export_to_quiz
- * @copyright  Joseph Rézeau moodle@rezeau.org
+ * @package    block_glossary_export_to_quiz
+ * @copyright  Joseph Rézeau <moodle@rezeau.org>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012111300;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2011120500;        // Requires this Moodle version
-$plugin->component = 'block_glossary_export_to_quiz';  // Full name of the plugin (used for diagnostics)
+$capabilities = array(
+
+    'block/glossary_export_to_quiz:myaddinstance' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'user' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/my:manageblocks'
+    ),
+
+    'block/glossary_export_to_quiz:addinstance' => array(
+        'riskbitmask' => RISK_SPAM | RISK_XSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ),
+);
