@@ -1,5 +1,7 @@
 <?php 
 $string['allentries'] = 'All entries';
+$string['glossary_export_to_quiz:addinstance'] = 'Add a new glossary_export_to_quiz block';
+$string['glossary_export_to_quiz:myaddinstance'] = 'Add a new glossary_export_to_quiz block to the My Moodle page';
 $string['clicktoexport'] = 'Click to export this glossary\'s entries to quiz (XML)';
 $string['concept'] = 'Alphabetical order';
 $string['emptyglossaries'] = 'This course glossaries are empty (no entries)';
