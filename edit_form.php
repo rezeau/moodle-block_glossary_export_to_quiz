@@ -35,7 +35,8 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         $SESSION->block_glossary_export_to_quiz = new stdClass();
         $SESSION->block_glossary_export_to_quiz->status = 'defined';
         // Fields for editing HTML block title and contents.
-
+        $mform->addElement('static', 'generalhelp', get_string('pluginname','block_glossary_export_to_quiz') .' ('.get_string('help').')' );
+        $mform->addHelpButton('generalhelp', 'pluginname', 'block_glossary_export_to_quiz');
         // Select glossaries to put in dropdown box ...
         $glossaries = $DB->get_records_menu('glossary', array('course' => $this->block->course->id), 'name', 'id,name');
         if (!$glossaries) {
@@ -70,6 +71,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
 		            }
 	            }
             }
+
             if ($totalnumentries === 0) {
             	if ($numglossaries == 1) {
                     $emptyglossaries = 'emptyglossary'; 
@@ -79,11 +81,11 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
             	$mform->addElement('header', 'configheader', get_string($emptyglossaries, 'block_glossary_export_to_quiz'));
             } else {
                 $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+                
 		        $group = array($mform->createElement('selectgroups', 'config_glossary', '', $categoriesarray) );
 		        $mform->addGroup($group, 'selectglossary', get_string('selectglossary', 'block_glossary_export_to_quiz'), '', false);
 		        // and select sortorder types to put in dropdown box
-		        
-		        // help icons removed pending fix of  
+  
 		        $mform->addHelpButton('selectglossary', 'selectglossary', 'block_glossary_export_to_quiz');
 		        $types = array(
 		            0 => get_string('concept','block_glossary_export_to_quiz'),

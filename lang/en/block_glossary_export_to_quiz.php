@@ -8,6 +8,7 @@ $string['emptyglossaries'] = 'This course glossaries are empty (no entries)';
 $string['emptyglossary'] = 'This course glossary is empty (no entries)';
 $string['exportentriestoxml'] = 'Export entries to Quiz (XML)';
 $string['firstmodified'] = 'Oldest entries first';
+$string['generalhelp'] = 'Block Help';
 $string['lastmodified'] = 'Most recent entries first';
 $string['limitnum'] = 'Maximum number of entries to export';
 $string['limitnum_help'] = 'Leave empty to export all entries from selected Glossary or Category. 
@@ -20,6 +21,8 @@ $string['nolink'] = 'Remove glossary autolinks';
 $string['notyetconfigured'] = 'Please <b>Turn editing on</b> to configure this block.';
 $string['notyetconfiguredediting'] = 'Please configure this block using the edit icon.';
 $string['pluginname'] = 'Export Glossary to Quiz';
+$string['pluginname_help'] = 'Right-click the <b>More Help</b> link to view the Moodle Documentation Wiki.';
+$string['pluginname_link'] = 'block/glossary_export_to_quiz/edit';
 $string['questiontype'] = 'Question type:';
 $string['questiontype_help'] = 'Glossary entries can be exported to the Quiz Questions bank either as multiple choice or short answer questions.
 Multiple choice questions will consist of the following elements:
