@@ -17,9 +17,9 @@
 /**
  * Strings for component 'glossary_export_to_quiz', language 'en', branch 'MOODLE_25_STABLE'
  *
- * @package    mod
- * @subpackage quiz
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @package    block
+ * @subpackage glossary_export_to_quiz
+ * @copyright  Joseph Rézeau - moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
