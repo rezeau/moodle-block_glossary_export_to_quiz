@@ -18,7 +18,7 @@
  * Glossary random block caps.
  *
  * @package    block_glossary_export_to_quiz
- * @copyright  Joseph Rézeau <moodle@rezeau.org>
+ * @copyright  Joseph Rï¿½zeau <moodle@rezeau.org>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

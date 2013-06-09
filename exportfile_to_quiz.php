@@ -1,5 +1,5 @@
 <?php   // $Id: exportfile.php,v 1.8 2007/08/17 12:49:31 skodak Exp $
-// mod/glossary/exportfile.php modified by Joseph Rézeau NOVEMBER 2010 for exporting glossaries to XML for importing to question bank
+// mod/glossary/exportfile.php modified by Joseph Rï¿½zeau NOVEMBER 2010 for exporting glossaries to XML for importing to question bank
 	define('BGETQ_CONCEPT',      '0');
 	define('BGETQ_FIRSTMODIFIED', '2');
 	define('BGETQ_LASTMODIFIED', '1');

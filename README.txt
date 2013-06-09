@@ -10,4 +10,4 @@ Starting with version 2.5.0 (for Moodle 2.5) all translated language strings are
 
 http://lang.moodle.org/local/amos/view.php
 
-Joseph Rézeau
+Joseph Rï¿½zeau
