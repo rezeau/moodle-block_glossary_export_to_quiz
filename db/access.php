@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Glossary random block caps.
+ * Version details
  *
- * @package    block_glossary_export_to_quiz
- * @copyright  Joseph R�zeau <moodle@rezeau.org>
+ * @package    block
+ * @subpackage glossary_export_to_quiz
+ * @copyright  Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

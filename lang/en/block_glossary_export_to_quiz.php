@@ -22,7 +22,7 @@
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 $string['allentries'] = 'All entries';
 $string['glossary_export_to_quiz:addinstance'] = 'Add a new glossary_export_to_quiz block';
 $string['glossary_export_to_quiz:myaddinstance'] = 'Add a new glossary_export_to_quiz block to the My Moodle page';
@@ -35,10 +35,10 @@ $string['firstmodified'] = 'Oldest entries first';
 $string['generalhelp'] = 'Block Help';
 $string['lastmodified'] = 'Most recent entries first';
 $string['limitnum'] = 'Maximum number of entries to export';
-$string['limitnum_help'] = 'Leave empty to export all entries from selected Glossary or Category. 
+$string['limitnum_help'] = 'Leave empty to export all entries from selected Glossary or Category.
 This option can be useful for exporting a limited number of entries from very large glossaries.';
 $string['multichoice'] = 'Multiple Choice';
-$string['notenoughentries'] = 'Not enough entries (<b>{$a->numentries}</b>) in <b>Glossary</b> <em>{$a->varnotenough}</em> for Multichoice questions.'; 
+$string['notenoughentries'] = 'Not enough entries (<b>{$a->numentries}</b>) in <b>Glossary</b> <em>{$a->varnotenough}</em> for Multichoice questions.';
 $string['numentries'] = 'Export {$a} entries';
 $string['noglossaries'] = 'No glossaries in this course';
 $string['nolink'] = 'Remove glossary autolinks';
@@ -63,7 +63,7 @@ Short answer questions
 ** Example: original entry "Moodle". Accepted correct response: "Moodle".';
 $string['random'] = 'Randomly';
 $string['selectglossary'] = 'Select glossary to export from';
-$string['selectglossary_help'] = 'Use the dropdown list to select the glossary that you want to use to export its entries to the quiz questions bank. 
+$string['selectglossary_help'] = 'Use the dropdown list to select the glossary that you want to use to export its entries to the quiz questions bank.
 If that glossary contains categories, you can select only one category to export its entries.
 To cancel your choice or to reset the block, simply leave the dropdown list on the Choose... position.';
 $string['shortanswer'] = 'Short answer';
