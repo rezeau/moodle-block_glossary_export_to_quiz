@@ -79,14 +79,9 @@ class block_glossary_export_to_quiz extends block_base {
             return $this->content;
         }
 
-        if (strpos($this->config->glossary, ',')) {
-            $glossary = explode(",", $this->config->glossary);
-            $glossaryid = $glossary[0];
-            $categoryid = $glossary[1];
-        } else {
-            $glossaryid = $this->config->glossary;
-            $categoryid = '';
-        }
+        $glossary = explode(",", $this->config->glossary);
+        $glossaryid = $glossary[0];
+        $categoryid = $glossary[1];
 
         $cm = get_coursemodule_from_instance("glossary", $glossaryid);
         $cmid = $cm->id;
@@ -99,7 +94,7 @@ class block_glossary_export_to_quiz extends block_base {
         $glossaryid = $categories[0];
         $entriescount = 0;
         $numentries = 0;
-        if (isset ($categories[1])) {
+        if (isset ($categories[1]) && $categories[1] != 0) {
             $categoryid = $categories[1];
             $category = $DB->get_record('glossary_categories', array('id' => $categoryid));
             $entriescount = $DB->count_records("glossary_entries_categories", array('categoryid'=>$category->id));
@@ -136,9 +131,9 @@ class block_glossary_export_to_quiz extends block_base {
         $questiontype[5] = 'shortanswer_1'; // Case sensitive.
 
         $questiontype = $questiontype[$this->config->questiontype];
-        $actualquestiontype_params = explode('_', $questiontype);
-        $actualquestiontype = $actualquestiontype_params[0];
-        $actualquestionparam = $actualquestiontype_params[1];
+        $actualquestiontypeparams = explode('_', $questiontype);
+        $actualquestiontype = $actualquestiontypeparams[0];
+        $actualquestionparam = $actualquestiontypeparams[1];
 
         $stractualquestiontype = get_string($actualquestiontype, 'block_glossary_export_to_quiz');
         $strsortorder = '<b>'.get_string('sortingorder', 'block_glossary_export_to_quiz').'</b>: '.$type[$sortorder];
@@ -148,12 +143,7 @@ class block_glossary_export_to_quiz extends block_base {
         $glosssaryname = "<em>$cm->name</em>";
         $title = get_string('clicktoexport', 'block_glossary_export_to_quiz');
         $strglossary = get_string('currentglossary', 'glossary');
-        if (($actualquestiontype == 'multichoice') && $numentries < 4) {
-            $varnotenough = $glosssaryname.' | '.$categoryname;
-            $this->content->text = get_string('notenoughentries', 'block_glossary_export_to_quiz',
-                array('numentries'=>$numentries, 'varnotenough'=>$varnotenough));
-            return $this->content;
-        }
+
         $this->content->text   = '<b>'.$strglossary.'</b>: '.$glosssaryname.'<br />'.$categoryname.'<br />'.
             $strsortorder. '<br />'.$strquestiontype;
         $this->content->footer = '<a title="'.$title.'" href='

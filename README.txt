@@ -1,5 +1,13 @@
 Release notes
 
+Version 2.5.2 release 2013100800
+
+- Made strictly compliant with Moodle coding style.
+- Do not count not yet approved entries in glossary number of entries.
+- Fixed database read error in postgresql database. Thanks to Daniel Tillman for reporting bug.
+- Added validation for minimum number of entries for MCQ question type.
+
+--------------------------------
 Version 2.5.0 release 2013052100
 
 All instructions for installing and using are now in the Moodle Documentation Wiki at:

@@ -24,6 +24,7 @@
  */
 
 class block_glossary_export_to_quiz_edit_form extends block_edit_form {
+
     protected function specific_definition($mform) {
         global $DB, $SESSION;
         $SESSION->block_glossary_export_to_quiz = new stdClass();
@@ -46,25 +47,28 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
             $categoriesarray = array();
             $categoriesarray[''][0] = get_string('choosedots');
 
+            // Number of entries available in glossary/category.
+            $numentriesincategory = array();
+
             // TODO check if no glossaries available.
             $totalnumentries = 0;
             foreach ($glossaries as $key => $value) {
                 $glossarystring = $value;
-                $numentries = $DB->count_records('glossary_entries', array('glossaryid'=>$key));
+                $numentries = $DB->count_records('glossary_entries', array('glossaryid' => $key, 'approved' => 1));
                 $totalnumentries += $numentries;
                 if ($numentries) {
-                    $categoriesarray[$glossarystring][$key] = $glossarystring.' * '.
+                    $categoriesarray[$glossarystring][$key.',0'] = $glossarystring.' * '.
                         get_string('allentries', 'block_glossary_export_to_quiz').' ('.$numentries.')';
+                    $numentriesincategory[$key][0] = $numentries;
                     $select = 'glossaryid='.$key;
                     $categories = $DB->get_records_select('glossary_categories', $select, null, 'name ASC');
                     if (!empty ($categories)) {
-                        $categoriesarray[$glossarystring][$key] = $glossarystring.' * '.
-                            get_string('allentries', 'block_glossary_export_to_quiz').' ('.$numentries.')';
                         foreach ($categories as $category) {
                             $cid = $category->id;
                             $numentries = $DB->count_records('glossary_entries_categories', array('categoryid' => $category->id));
                             $categoriesarray[$glossarystring][$key.','.$cid] = $glossarystring.' :: '.
                                 $category->name.' ('.$numentries.')';
+                            $numentriesincategory[$key][$cid] = $numentries;
                         }
                     }
                 }
@@ -78,13 +82,15 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 }
                 $mform->addElement('header', 'configheader', get_string($emptyglossaries, 'block_glossary_export_to_quiz'));
             } else {
+                $this->categoriesarray = $categoriesarray;
+                $this->numentriesincategory = $numentriesincategory;
                 $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
                 $group = array($mform->createElement('selectgroups', 'config_glossary', '', $categoriesarray) );
                 $mform->addGroup($group, 'selectglossary',
                                 get_string('selectglossary', 'block_glossary_export_to_quiz'), '', false);
-                // And select sortorder types to put in dropdown box.
 
+                // And select sortorder types to put in dropdown box.
                 $mform->addHelpButton('selectglossary', 'selectglossary', 'block_glossary_export_to_quiz');
                 $types = array(
                     0 => get_string('concept', 'block_glossary_export_to_quiz'),
@@ -119,5 +125,33 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->addHelpButton('config_questiontype', 'questiontype', 'block_glossary_export_to_quiz');
             }
         }
+    }
+
+    public function validation($data, $files) {
+        $glossaryid = $data['config_glossary'];
+        if ($glossaryid == 0) {
+            return;
+        }
+        $errors = parent::validation($data, $files);
+        $glossary = explode(",", $glossaryid);
+        $glossaryid = $glossary[0];
+        $categoryid = $glossary[1];
+        $glossarynumentries = $this->numentriesincategory[$glossaryid][$categoryid];
+        $questiontype = $data['config_questiontype'];
+        $maxentries = $data['config_limitnum'];
+
+        if ($questiontype < 4 && ($maxentries < 4 || $glossarynumentries < 4)) {
+            if ($maxentries < 4) {
+                $errormsg = 'notenoughentriesselected';
+                $numentries = $maxentries;
+            }
+            if ($glossarynumentries < 4) {
+                $errormsg = 'notenoughentriesavailable';
+                $numentries = $glossarynumentries;
+            }
+            $errors['config_limitnum'] = get_string($errormsg, 'block_glossary_export_to_quiz', $numentries);
+        }
+
+        return $errors;
     }
 }

@@ -38,7 +38,8 @@ $string['limitnum'] = 'Maximum number of entries to export';
 $string['limitnum_help'] = 'Leave empty to export all entries from selected Glossary or Category.
 This option can be useful for exporting a limited number of entries from very large glossaries.';
 $string['multichoice'] = 'Multiple Choice';
-$string['notenoughentries'] = 'Not enough entries (<b>{$a->numentries}</b>) in <b>Glossary</b> <em>{$a->varnotenough}</em> for Multichoice questions.';
+$string['notenoughentriesavailable'] = 'Not enough entries available ({$a}) for Multichoice questions (minimum 4 entries needed).';
+$string['notenoughentriesselected'] = 'Not enough entries selected ({$a}) for Multichoice questions (minimum 4 entries needed).';
 $string['numentries'] = 'Export {$a} entries';
 $string['noglossaries'] = 'No glossaries in this course';
 $string['nolink'] = 'Remove glossary autolinks';

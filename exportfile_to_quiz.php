@@ -85,7 +85,7 @@ switch ($sortorder) {
 }
 
 if ($limitnum) {
-    $limit = "LIMIT $limitfrom, $limitnum ";
+    $limit = "LIMIT  $limitnum OFFSET $limitfrom ";
 } else {
     $limit = '';
 }
@@ -102,7 +102,7 @@ if ($cat) {
 }
 $sql = "SELECT * FROM ".$CFG->prefix."glossary_entries ge $catfrom "
 . "WHERE ge.glossaryid = $glossary->id "
-. "AND ge.approved "
+. "AND ge.approved = 1 "
 . "$catwhere "
 . "$sortorder "
 . "$limit";
@@ -123,16 +123,16 @@ $expout .= "  </question>\n";
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 
 if ( $entries = $DB->get_records_sql($sql) ) {
-    $questiontype_params = explode("_", $questiontype);
-    $questiontype = $questiontype_params[0];
+    $questiontypeparams = explode("_", $questiontype);
+    $questiontype = $questiontypeparams[0];
     if ($questiontype == 'multichoice') {
-        $answernumbering = $questiontype_params[1];
+        $answernumbering = $questiontypeparams[1];
         $concepts = array();
         foreach ($entries as $entry) {
             $concepts[] = $entry->concept;
         }
     } else {
-        $usecase = $questiontype_params[1];
+        $usecase = $questiontypeparams[1];
     }
     foreach ($entries as $entry) {
         $counter++;
@@ -141,10 +141,10 @@ if ( $entries = $DB->get_records_sql($sql) ) {
         $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
         $concept = trusttext_strip($entry->concept);
         $expout .= "\n\n<!-- question: $counter  -->\n";
-        $name_text = writetext( $concept );
+        $nametext = writetext( $concept );
         $qtformat = "html";
         $expout .= "  <question type=\"$questiontype\">\n";
-        $expout .= "    <name>$name_text</name>\n";
+        $expout .= "    <name>$nametext</name>\n";
         $expout .= "    <questiontext format=\"$qtformat\">\n";
         $expout .= writetext( $definition );;
         $expout .= writefiles($entryfiles);
@@ -159,7 +159,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     unset($concepts2[$key]);
                 }
             }
-            $rand_keys = array_rand($concepts2, 3);
+            $randkeys = array_rand($concepts2, 3);
             for ($i=0; $i<4; $i++) {
                 if ($i === 0) {
                     $percent = 100;
@@ -172,7 +172,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     $expout .= "    </answer>\n";
                 } else {
                     $percent = 0;
-                    $distracter = $concepts2[$rand_keys[$i-1]];
+                    $distracter = $concepts2[$randkeys[$i-1]];
                     $expout .= "      <answer fraction=\"$percent\">\n";
                     $expout .= writetext( $distracter, 3, false )."\n";
                     $expout .= "      <feedback>\n";
