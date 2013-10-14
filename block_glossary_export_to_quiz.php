@@ -54,7 +54,7 @@ class block_glossary_export_to_quiz extends block_base {
         $this->content = new stdClass();
         // Set view block permission to course:mod/glossary:export to prevent students etc to view this block.
         $course = $this->page->course;
-        $context = get_context_instance(CONTEXT_COURSE, $course->id);
+        $context = context_course::instance($course->id);
         if (!has_capability('mod/glossary:export', $context)) {
             return;
         }

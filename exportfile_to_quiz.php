@@ -56,7 +56,7 @@ if (! $glossary = $DB->get_record("glossary", array('id'=>$cm->instance))) {
 
 require_login($course->id, false, $cm);
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 require_capability('mod/glossary:export', $context);
 
 $filename = clean_filename(strip_tags(format_string($glossary->name, true)).'.xml');
@@ -120,7 +120,7 @@ $expout .= "    <category>\n";
 $expout .= "        $categorypath\n";
 $expout .= "    </category>\n";
 $expout .= "  </question>\n";
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
 if ( $entries = $DB->get_records_sql($sql) ) {
     $questiontypeparams = explode("_", $questiontype);
