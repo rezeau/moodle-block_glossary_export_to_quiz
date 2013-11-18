@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2013100800;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2013051400;        // Requires this Moodle version
+$plugin->version   = 2013111800;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2013111800;        // Requires this Moodle version
 $plugin->component = 'block_glossary_export_to_quiz';  // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '2.6.0 for moodle 2.6';
