@@ -1,12 +1,14 @@
 Release notes
-
+--------------------------------
+Version 2.5.6 release 2013111800
+- Compliant with Moodle 2.6.
+- Added a "return to course" button on the Export page.
+--------------------------------
 Version 2.5.2 release 2013100800
-
 - Made strictly compliant with Moodle coding style.
 - Do not count not yet approved entries in glossary number of entries.
 - Fixed database read error in postgresql database. Thanks to Daniel Tillman for reporting bug.
 - Added validation for minimum number of entries for MCQ question type.
-
 --------------------------------
 Version 2.5.0 release 2013052100
 
