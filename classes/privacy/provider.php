@@ -15,18 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Privacy Subsystem implementation for block_feedback.
  *
- * @package    block
- * @subpackage glossary_export_to_quiz
- * @copyright  Joseph Rézeau moodle@rezeau.org
+ * @package    block_feedback
+ * @copyright  2018 Zig Tan <zig@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace block_feedback\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018091400;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014050800;        // Requires this Moodle version
-$plugin->component = 'block_glossary_export_to_quiz';  // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.5.0 for moodle 3.5';
+/**
+ * Privacy Subsystem for block_feedback implementing null_provider.
+ *
+ * @copyright  2018 Zig Tan <zig@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}
