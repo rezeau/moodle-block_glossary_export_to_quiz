@@ -38,10 +38,13 @@ require_once("../../lib/filelib.php");
 
 $id = required_param('id', PARAM_INT);      // Course Module ID.
 $cat = optional_param('cat', 0, PARAM_ALPHANUM);
-$limitnum = optional_param('limitnum', 0, PARAM_ALPHANUM);
+$limitnum = optional_param('limitnum', '', PARAM_ALPHANUM);
+$nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
+$numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
 $entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
 $questiontype =  optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
+
 if (! $cm = get_coursemodule_from_id('glossary', $id)) {
     error("Course Module ID was incorrect");
 }
@@ -59,23 +62,14 @@ require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/glossary:export', $context);
 
-$filename = clean_filename(strip_tags(format_string($glossary->name, true)).'.xml');
-$giftcategoryname = $glossary->name;
-
-$limitfrom = 0;
-
 switch ($sortorder) {
     case BGETQ_RANDOMLY:
-        if (!isset($limitnum)) {
-            $limitnum = 0;
-        }
-        $i = rand(1, $entriescount - $limitnum);
-        $limitfrom = $i-1;
-        $sortorder = '';
+        $sortorder = 'ORDER BY RAND()';
+        // May be slow on a very large glossary, see http://www.titov.net/2005/09/21/do-not-use-order-by-rand-or-how-to-get-random-rows-from-table/
         break;
     case BGETQ_CONCEPT:
-            $sortorder = 'ORDER BY concept ASC';
-            break;
+        $sortorder = 'ORDER BY concept ASC';
+        break;
     case BGETQ_FIRSTMODIFIED:
         $sortorder = 'ORDER BY timemodified ASC';
         break;
@@ -85,14 +79,15 @@ switch ($sortorder) {
 }
 
 if ($limitnum) {
-    $limit = "LIMIT  $limitnum OFFSET $limitfrom ";
+    $limit = "LIMIT  $limitnum ";
 } else {
     $limit = '';
+    $limitnum = $entriescount;
 }
 
 $catfrom = "";
 $catwhere = "";
-
+$giftcategoryname = $glossary->name;
 if ($cat) {
     $category = $DB->get_record('glossary_categories', array('id'=>$cat));
     $categoryname = $category->name;
@@ -100,6 +95,7 @@ if ($cat) {
     $catfrom = ", mdl_glossary_entries_categories c ";
     $catwhere = "and ge.id = c.entryid and c.categoryid = $cat";
 }
+
 $sql = "SELECT * FROM ".$CFG->prefix."glossary_entries ge $catfrom "
 . "WHERE ge.glossaryid = $glossary->id "
 . "AND ge.approved = 1 "
@@ -110,9 +106,28 @@ $sql = "SELECT * FROM ".$CFG->prefix."glossary_entries ge $catfrom "
 // Build XML file - based on moodle/question/xml/format.php.
 // Add opening tag.
 $expout = "";
-$counter=0;
+$questionscounter=0;
+$questiontypeparams = explode("_", $questiontype);
+$questiontype = $questiontypeparams[0];
 
-$expout .= "\n\n<!-- question: $counter  -->\n";
+switch ($questiontype) {
+    case 'multichoice':
+        $questiontype_abbr = ' MCQ';
+        break;
+    case 'shortanswer':
+        $questiontype_abbr = ' SA';
+        break;
+    case 'matching':
+        $questiontype_abbr = ' MATCHING';
+        break;
+    case 'ddwtos':
+        $questiontype_abbr = ' DRAGDROPTEXT';
+        break;
+}
+
+$giftcategoryname .= ' '.$numquestions.$questiontype_abbr;
+$filename = clean_filename(strip_tags(format_string($giftcategoryname, true)).' questions.xml');
+$expout .= "\n\n<!-- question: $questionscounter  -->\n";
 
 $categorypath = writetext( $giftcategoryname );
 $expout .= "  <question type=\"category\">\n";
@@ -123,74 +138,180 @@ $expout .= "  </question>\n";
 $context = context_module::instance($cm->id);
 
 if ( $entries = $DB->get_records_sql($sql) ) {
-    $questiontypeparams = explode("_", $questiontype);
-    $questiontype = $questiontypeparams[0];
-    if ($questiontype == 'multichoice') {
-        $answernumbering = $questiontypeparams[1];
-        $concepts = array();
-        foreach ($entries as $entry) {
-            $concepts[] = $entry->concept;
-        }
-    } else {
-        $usecase = $questiontypeparams[1];
+    switch ($questiontype) {
+        case 'multichoice':
+            $answernumbering = $questiontypeparams[1];
+            $concepts = array();
+            foreach ($entries as $entry) {
+                $concepts[] = $entry->concept;
+            }
+            break;
+        case 'shortanswer':
+            $usecase = $questiontypeparams[1]!== '';
+            break;
+        case 'matching':
+            $shuffle = $questiontypeparams[1] !== '';
+            $questiontext = get_string('matchinstructions', 'block_glossary_export_to_quiz');
+            break;
+        case 'ddwtos':
+            $shuffle = $questiontypeparams[1] !== '';
+            $instructions = get_string('ddwtosinstructions', 'block_glossary_export_to_quiz');
+            break;
     }
-    foreach ($entries as $entry) {
-        $counter++;
-        $definition = trusttext_strip($entry->definition);
-        $fs = get_file_storage();
-        $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
-        $concept = trusttext_strip($entry->concept);
-        $expout .= "\n\n<!-- question: $counter  -->\n";
-        $nametext = writetext( $concept );
-        $qtformat = "html";
-        $expout .= "  <question type=\"$questiontype\">\n";
-        $expout .= "    <name>$nametext</name>\n";
-        $expout .= "    <questiontext format=\"$qtformat\">\n";
-        $expout .= writetext( $definition );;
-        $expout .= writefiles($entryfiles);
-        $expout .= "    </questiontext>\n";
 
-        if ( $questiontype == 'multichoice') {
-            $expout .= "    <shuffleanswers>true</shuffleanswers>\n";
-            $expout .= "    <answernumbering>".$answernumbering."</answernumbering>\n";
-            $concepts2 = $concepts;
-            foreach ($concepts2 as $key => $value) {
-                if ($value == $concept) {
-                    unset($concepts2[$key]);
+    if ($questiontype == 'matching') {        
+        $subquestionscounter = 0;
+        $questionscounter++;
+        foreach ($entries as $entry) {            
+            if ($subquestionscounter == $nbchoices) {
+                $subquestionscounter = 0;
+                // Close the question tag.
+                $expout .= "</question>\n";
+            }             
+            if ($subquestionscounter === 0) { // Start new matching question
+                $concept = trusttext_strip($entry->concept);
+                $nametext = writetext( $concept.' etc.' );
+                $expout .= "\n\n<!-- question: $questionscounter  -->\n";                
+                $qtformat = "html";
+                $expout .= "  <question type=\"$questiontype\">\n";
+                $expout .= "    <name>$nametext</name>\n";
+                $expout .= "    <questiontext format=\"$qtformat\">\n";
+                $expout .= writetext( $questiontext );
+                $expout .= "    </questiontext>\n";
+                $expout .= "    <shuffleanswers>" .$shuffle . "</shuffleanswers>\n";
+                $questionscounter++;                
+            }                      
+            $concept = trusttext_strip($entry->concept);
+            $definition = trusttext_strip($entry->definition);
+            $fs = get_file_storage();
+            $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+            $expout .= "    <subquestion format=\"$qtformat\">\n";            
+            $expout .= writetext($definition, 3);
+            $expout .= writefiles($entryfiles);
+            $expout .= "      <answer>\n";
+            $expout .= writetext($concept, 4);
+            $expout .= "      </answer>\n";
+            $expout .= "    </subquestion>\n";            
+            $subquestionscounter++;          
+        }
+        // Close the last question tag.
+        $expout .= "</question>\n";   
+    } else if ($questiontype == 'ddwtos') {
+        $choicescounter = 0;
+        $questionscounter++;
+        $questiontext = '';        
+        $dragboxconcept = array();     
+        
+        foreach ($entries as $entry) {                           
+            
+            if ($choicescounter == $nbchoices) {
+                $choicescounter = 0;
+                // Write question text and dragboxes.
+                $expout .= writetext($questiontext, 3);
+                $expout .= "    </questiontext>\n"; 
+                $expout .= "    <shuffleanswers>" .$shuffle . "</shuffleanswers>\n";     
+                for ($j = 0; $j < $nbchoices; $j++) {
+                    $expout .= "      <dragbox>\n";
+                    $expout .= writetext($dragboxconcept[$j], $nbchoices);
+                    $expout .= "      </dragbox>\n";
                 }
-            }
-            $randkeys = array_rand($concepts2, 3);
-            for ($i=0; $i<4; $i++) {
-                if ($i === 0) {
+                $expout .= "</question>\n";                
+            }             
+            if ($choicescounter == 0) { // Start new matching question            
+                $questiontext = '';
+                $concept = trusttext_strip($entry->concept);
+                $nametext = writetext( $concept.' etc.' );
+                $expout .= "\n\n<!-- question: $questionscounter  -->\n";                
+                $qtformat = "html";
+                $expout .= "  <question type=\"$questiontype\">\n";
+                $expout .= "    <name>$nametext</name>\n";
+                $expout .= "    <questiontext format=\"$qtformat\">\n";                
+                $questiontext .= '<p>'.$instructions.'</p>';
+                $questionscounter++;                
+            }            
+            $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
+            $definition = trusttext_strip($entry->definition);
+            $questiontext .= '<p>[['. ($choicescounter + 1). ']]'. $definition.'</p>';
+            $fs = get_file_storage();
+            $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+            $expout .= writefiles($entryfiles);
+            $choicescounter++;                                                                                       
+        }
+        // Write the final question text and dragboxes!
+        $expout .= writetext($questiontext, 3);
+        $expout .= "    </questiontext>\n";   
+        for ($j = 0; $j < $nbchoices; $j++) {
+            $expout .= "      <dragbox>\n";
+            $expout .= writetext($dragboxconcept[$j], $nbchoices);
+            $expout .= "      </dragbox>\n";
+        }
+        $expout .= "    <shuffleanswers>" .$shuffle . "</shuffleanswers>\n";
+        $expout .= "</question>\n";                   
+        
+    } else {
+        foreach ($entries as $entry) {
+            $questionscounter++;
+            $definition = trusttext_strip($entry->definition);
+            $fs = get_file_storage();
+            $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+            $concept = trusttext_strip($entry->concept);
+            $expout .= "\n\n<!-- question: $questionscounter  -->\n";
+            $nametext = writetext( $concept );
+            $qtformat = "html";
+            $expout .= "  <question type=\"$questiontype\">\n";
+            $expout .= "    <name>$nametext</name>\n";
+            $expout .= "    <questiontext format=\"$qtformat\">\n";
+            $expout .= writetext( $definition );
+            $expout .= writefiles($entryfiles);
+            $expout .= "    </questiontext>\n";
+    
+            switch ($questiontype) {               
+                case 'multichoice':
+                    $expout .= "    <shuffleanswers>true</shuffleanswers>\n";
+                    $expout .= "    <answernumbering>".$answernumbering."</answernumbering>\n";
+                    $concepts2 = $concepts;
+                    foreach ($concepts2 as $key => $value) {
+                        if ($value == $concept) {
+                            unset($concepts2[$key]);
+                        }
+                    }
+                    $randkeys = array_rand($concepts2, 3);
+                    for ($i = 0; $i < 4; $i++) {
+                        if ($i === 0) {
+                            $percent = 100;
+                            $expout .= "      <answer fraction=\"$percent\">\n";
+                            $expout .= writetext( $concept, 3, false )."\n";
+                            $expout .= "      <feedback>\n";
+                            $expout .= "      <text>\n";
+                            $expout .= "      </text>\n";
+                            $expout .= "      </feedback>\n";
+                            $expout .= "    </answer>\n";
+                        } else {
+                            $percent = 0;
+                            $distracter = $concepts2[$randkeys[$i-1]];
+                            $expout .= "      <answer fraction=\"$percent\">\n";
+                            $expout .= writetext( $distracter, 3, false )."\n";
+                            $expout .= "      <feedback>\n";
+                            $expout .= "      <text>\n";
+                            $expout .= "      </text>\n";
+                            $expout .= "      </feedback>\n";
+                            $expout .= "    </answer>\n";
+                        }
+                    }
+                    $expout .= "</question>\n";
+                    break;   
+                case 'shortanswer':
+                    $expout .= "    <usecase>$usecase</usecase>\n ";
                     $percent = 100;
-                    $expout .= "      <answer fraction=\"$percent\">\n";
-                    $expout .= writetext( $concept, 3, false )."\n";
-                    $expout .= "      <feedback>\n";
-                    $expout .= "      <text>\n";
-                    $expout .= "      </text>\n";
-                    $expout .= "      </feedback>\n";
+                    $expout .= "    <answer fraction=\"$percent\">\n";
+                    $expout .= writetext( $concept, 3, false );
                     $expout .= "    </answer>\n";
-                } else {
-                    $percent = 0;
-                    $distracter = $concepts2[$randkeys[$i-1]];
-                    $expout .= "      <answer fraction=\"$percent\">\n";
-                    $expout .= writetext( $distracter, 3, false )."\n";
-                    $expout .= "      <feedback>\n";
-                    $expout .= "      <text>\n";
-                    $expout .= "      </text>\n";
-                    $expout .= "      </feedback>\n";
-                    $expout .= "    </answer>\n";
-                }
+                    $expout .= "</question>\n";
+                    break;
             }
-        } else { // Shortanswer.
-            $expout .= "    <usecase>$usecase</usecase>\n ";
-            $percent = 100;
-            $expout .= "    <answer fraction=\"$percent\">\n";
-            $expout .= writetext( $concept, 3, false );
-            $expout .= "    </answer>\n";
         }
         // Close the question tag.
-        $expout .= "</question>\n";
+        //$expout .= "</question>\n";
     }
 }
     // Initial string.

@@ -35,12 +35,13 @@ $string['firstmodified'] = 'Oldest entries first';
 $string['generalhelp'] = 'Block Help';
 $string['lastmodified'] = 'Most recent entries first';
 $string['limitnum'] = 'Maximum number of entries to export';
-$string['limitnum_help'] = 'Leave empty to export all entries from selected Glossary or Category.
+$string['limitnum_help'] = 'Leave this field at its default "0" value to export ALL entries from selected Glossary or Category.
 This option can be useful for exporting a limited number of entries from very large glossaries.';
 $string['multichoice'] = 'Multiple Choice';
 $string['notenoughentriesavailable'] = 'Not enough entries available ({$a}) for Multichoice questions (minimum 4 entries needed).';
 $string['notenoughentriesselected'] = 'Not enough entries selected ({$a}) for Multichoice questions (minimum 4 entries needed).';
 $string['numentries'] = 'Export {$a} entries';
+$string['numquestions'] = ' and create {$a} questions';
 $string['noglossaries'] = 'No glossaries in this course';
 $string['nolink'] = 'Remove glossary autolinks';
 $string['notyetconfigured'] = 'Please <b>Turn editing on</b> to configure this block.';
@@ -62,14 +63,23 @@ Short answer questions
 ** Example: original entry "Moodle". Accepted correct responses: "Moodle", "moodle".
 * Case sensitive. Student responses will be only be accepted as correct it the case of the original glossary entry concept is used..
 ** Example: original entry "Moodle". Accepted correct response: "Moodle".';
+$string['questionoptions'] = 'Question options:';
+$string['questionoptions_help'] = 'Help for question options';
 $string['random'] = 'Randomly';
 $string['selectglossary'] = 'Select glossary to export from';
 $string['selectglossary_help'] = 'Use the dropdown list to select the glossary that you want to use to export its entries to the quiz questions bank.
 If that glossary contains categories, you can select only one category to export its entries.
 To cancel your choice or to reset the block, simply leave the dropdown list on the Choose... position.';
 $string['shortanswer'] = 'Short answer';
-$string['shortanswer_0'] = 'Short answer (Case insensitive)';
-$string['shortanswer_1'] = 'Short answer (Case sensitive)';
+$string['caseinsensitive'] = 'Case insensitive';
+$string['casesensitive'] = 'Case sensitive';
 $string['sortingorder'] = 'Sorting Order';
 $string['sortingorder_help'] = 'Use this setting to determine how the exported glossary entries will be ordered when you import them to your questions data bank.
 This can be used, in combination with the Maximum number of entries, for creating a quiz to test the latest entries to your glossary (especially a fairly large one). ';
+$string['matchinstructions'] = 'Match the definitions and the concepts';
+$string['ddwtos'] = 'Drag and drop into text';
+$string['ddwtosinstructions'] = 'Drag each concept label to match its definition';
+$string['nbchoices'] = 'Number of choices';
+$string['nbchoices_help'] = 'Select how many choices you want to make available. 
+
+Does not apply to the shortanswer question type.';

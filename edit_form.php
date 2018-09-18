@@ -104,25 +104,37 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->addElement('text', 'config_limitnum',
                                 get_string('limitnum', 'block_glossary_export_to_quiz'), array('size' => 5));
                 $mform->addHelpButton('config_limitnum', 'limitnum', 'block_glossary_export_to_quiz');
-                $mform->setDefault('config_limitnum', 0);
+                $mform->setDefault('config_limitnum', '');
                 $mform->setType('config_limitnum', PARAM_INTEGER);
 
                 // And select question types to put in dropdown box.
-                $types = array(
-                    0 => get_string('multichoice', 'block_glossary_export_to_quiz').
-                                ' ('.get_string('answernumberingabc', 'qtype_multichoice').')',
-                    1 => get_string('multichoice', 'block_glossary_export_to_quiz').' ('.
-                                get_string('answernumberingABCD', 'qtype_multichoice').')',
-                    2 => get_string('multichoice', 'block_glossary_export_to_quiz').' ('.
-                                get_string('answernumbering123', 'qtype_multichoice').')',
-                    3 => get_string('multichoice', 'block_glossary_export_to_quiz').' ('.
-                                get_string('answernumberingnone', 'qtype_multichoice').')',
-                    4 => get_string('shortanswer_0', 'block_glossary_export_to_quiz'),
-                    5 => get_string('shortanswer_1', 'block_glossary_export_to_quiz')
-                );
+                
+                $strquestiontypes = array(
+                    0 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingabc', 'qtype_multichoice').')',
+                    1 => get_string('multichoice', 'quiz').' ('.get_string('answernumbering123', 'qtype_multichoice').')',
+                    2 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingnone', 'qtype_multichoice').')',                                                 
+                    3 => get_string('shortanswer', 'quiz').' ('.get_string('caseinsensitive', 'block_glossary_export_to_quiz').')',
+                    4 => get_string('shortanswer', 'quiz').' ('.get_string('casesensitive', 'block_glossary_export_to_quiz').')',
+                    5 => get_string('match', 'quiz'),
+                    6 => get_string('match', 'quiz').' ('.get_string('shuffleanswers', 'quiz').')',
+                    7 => get_string('ddwtos', 'block_glossary_export_to_quiz'),
+                    8 => get_string('ddwtos', 'block_glossary_export_to_quiz').' ('.get_string('shuffleanswers', 'quiz').')'                    
+                );             
                 $mform->addElement('select', 'config_questiontype',
-                                get_string('questiontype', 'block_glossary_export_to_quiz'), $types);
+                                get_string('questiontype', 'block_glossary_export_to_quiz'), $strquestiontypes);
                 $mform->addHelpButton('config_questiontype', 'questiontype', 'block_glossary_export_to_quiz');
+                
+                $nbchoices = array(
+                    3 => 3,
+                    4 => 4,
+                    5 => 5,
+                    6 => 6,
+                    7 => 7,
+                    8 => 8
+                );
+                $mform->addElement('select', 'config_nbchoices',
+                    get_string('nbchoices', 'block_glossary_export_to_quiz'), $nbchoices);
+                $mform->addHelpButton('config_nbchoices', 'nbchoices', 'block_glossary_export_to_quiz');            
             }
         }
     }
@@ -138,18 +150,30 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         $categoryid = $glossary[1];
         $glossarynumentries = $this->numentriesincategory[$glossaryid][$categoryid];
         $questiontype = $data['config_questiontype'];
-        $maxentries = $data['config_limitnum'];
+        if ($data['config_limitnum']) {
+            $maxentries = $data['config_limitnum'];
+        } else {
+            $maxentries = $glossarynumentries;
+        }
 
-        if ($questiontype < 4 && ($maxentries < 4 || $glossarynumentries < 4)) {
-            if ($maxentries < 4) {
-                $errormsg = 'notenoughentriesselected';
-                $numentries = $maxentries;
+        $nbchoices = $data['config_nbchoices'];
+        if ($questiontype < 3 || $questiontype > 4) {
+            if ($maxentries < $nbchoices || $glossarynumentries < $nbchoices) {
+                if ($maxentries < $nbchoices ) {
+                    $errormsg = 'notenoughentriesselected';
+                    $numentries = $maxentries;
+                }
+                if ($glossarynumentries < $nbchoices) {
+                    $errormsg = 'notenoughentriesavailable';
+                    $numentries = $glossarynumentries;
+                }
+                $errors['config_limitnum'] = get_string($errormsg, 'block_glossary_export_to_quiz', $numentries);
             }
-            if ($glossarynumentries < 4) {
-                $errormsg = 'notenoughentriesavailable';
-                $numentries = $glossarynumentries;
-            }
-            $errors['config_limitnum'] = get_string($errormsg, 'block_glossary_export_to_quiz', $numentries);
+        }
+        
+        if ($maxentries > $glossarynumentries) {                      
+            $errors['config_limitnum'] = '<b>'.get_string('warning', 'moodle').'</b>: '.get_string('limitnum', 'block_glossary_export_to_quiz').' ('.$maxentries.') > '.
+                get_string('numberofentries', 'glossary').' ('.$glossarynumentries.') !';
         }
 
         return $errors;

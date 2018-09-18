@@ -32,9 +32,11 @@ $id = required_param('id', PARAM_INT);      // Course Module ID.
 
 $cat = optional_param('cat', 0, PARAM_ALPHANUM);
 $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUM);
-$limitnum = optional_param('limitnum', 0, PARAM_ALPHANUM);
+$limitnum = optional_param('limitnum', '', PARAM_ALPHANUM);
 $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
 $entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
+$nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
+$numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $questiontype =  optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
 $url = new moodle_url('/mod/glossary/export.php', array('id'=>$id));
 if ($cat !== 0) {
@@ -83,6 +85,8 @@ echo '
     <input type="hidden" name="questiontype" value='.$questiontype.' />
     <input type="hidden" name="sortorder" value='.$sortorder.' />
     <input type="hidden" name="entriescount" value='.$entriescount.' />
+    <input type="hidden" name="nbchoices" value='.$nbchoices.' />
+    <input type="hidden" name="numquestions" value='.$numquestions.' />
     </div>
     </form>
 ';

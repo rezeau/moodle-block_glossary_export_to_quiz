@@ -25,8 +25,14 @@
 
 class block_glossary_export_to_quiz extends block_base {
     public function init() {
-        global $SESSION;
+        global $SESSION; 
         $this->title = get_string('pluginname', 'block_glossary_export_to_quiz');
+    }
+
+    function applicable_formats() {
+        return array(
+            'course-view' => true
+        );
     }
 
     public function specialization() {
@@ -115,7 +121,18 @@ class block_glossary_export_to_quiz extends block_base {
             $numentries = $entriescount;
         }
 
-        $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz', $numentries);
+        $qtype = $this->config->questiontype;
+        if ($qtype /*< 3 || $qtype*/ > 4) { // matching or drag&drop question
+            $nbchoices = $this->config->nbchoices;
+            $limitnum = floor ($numentries / $nbchoices) * $nbchoices;
+            $numentries = $limitnum; 
+            $numquestions = $limitnum / $nbchoices;
+        } else {
+            $numquestions = $numentries;
+            $nbchoices = ''; 
+        }
+
+        $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz', $numentries).get_string('numquestions', 'block_glossary_export_to_quiz', $numquestions);
 
         $sortorder = $this->config->sortingorder;
         $type[0] = get_string('concept', 'block_glossary_export_to_quiz');
@@ -124,18 +141,32 @@ class block_glossary_export_to_quiz extends block_base {
         $type[3] = get_string('random', 'block_glossary_export_to_quiz');
 
         $questiontype[0] = 'multichoice_abc';
-        $questiontype[1] = 'multichoice_ABCD';
-        $questiontype[2] = 'multichoice_123';
-        $questiontype[3] = 'multichoice_none';
-        $questiontype[4] = 'shortanswer_0'; // Case insensitive.
-        $questiontype[5] = 'shortanswer_1'; // Case sensitive.
+        $questiontype[1] = 'multichoice_123';
+        $questiontype[2] = 'multichoice_none';
+        $questiontype[3] = 'shortanswer_';
+        $questiontype[4] = 'shortanswer_usecase';
+        $questiontype[5] = 'matching_';
+        $questiontype[6] = 'matching_shuffleanswers';
+        $questiontype[7] = 'ddwtos_';
+        $questiontype[8] = 'ddwtos_shuffleanswers';
+        
+        $strquestiontypes = array(
+            0 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingabc', 'qtype_multichoice').')',
+            1 => get_string('multichoice', 'quiz').' ('.get_string('answernumbering123', 'qtype_multichoice').')',
+            2 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingnone', 'qtype_multichoice').')',
+            3 => get_string('shortanswer', 'quiz').' ('.get_string('caseinsensitive', 'block_glossary_export_to_quiz').')',
+            4 => get_string('shortanswer', 'quiz').' ('.get_string('casesensitive', 'block_glossary_export_to_quiz').')',
+            5 => get_string('match', 'quiz'),
+            6 => get_string('match', 'quiz').' ('.get_string('shuffleanswers', 'quiz').')',
+            7 => get_string('ddwtos', 'block_glossary_export_to_quiz'),
+            8 => get_string('ddwtos', 'block_glossary_export_to_quiz').' ('.get_string('shuffleanswers', 'quiz').')'
+        );
 
         $questiontype = $questiontype[$this->config->questiontype];
+        $stractualquestiontype = $strquestiontypes[$this->config->questiontype];
         $actualquestiontypeparams = explode('_', $questiontype);
         $actualquestiontype = $actualquestiontypeparams[0];
         $actualquestionparam = $actualquestiontypeparams[1];
-
-        $stractualquestiontype = get_string($actualquestiontype, 'block_glossary_export_to_quiz');
         $strsortorder = '<b>'.get_string('sortingorder', 'block_glossary_export_to_quiz').'</b>: '.$type[$sortorder];
         $strquestiontype = '<b>'.get_string('questiontype', 'block_glossary_export_to_quiz').'</b> '.$stractualquestiontype;
         $cm = get_coursemodule_from_instance("glossary", $glossaryid);
@@ -149,7 +180,7 @@ class block_glossary_export_to_quiz extends block_base {
         $this->content->footer = '<a title="'.$title.'" href='
             .$CFG->wwwroot.'/blocks/glossary_export_to_quiz/export_to_quiz.php?id='
             .$cmid.'&amp;cat='.$categoryid.'&amp;limitnum='.$limitnum.'&amp;questiontype='.$questiontype
-            .'&amp;sortorder='.$sortorder.'&amp;entriescount='.$numentries.'>'
+            .'&amp;sortorder='.$sortorder.'&amp;entriescount='.$numentries.'&amp;nbchoices='.$nbchoices.'&amp;numquestions='.$numquestions.'>'
             .'<b>'.$strnumentries.'</b></a>';
             return $this->content;
     }
