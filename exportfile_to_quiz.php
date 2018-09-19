@@ -17,8 +17,7 @@
 /**
  * Version details
  *
- * @package    block
- * @subpackage glossary_export_to_quiz
+ * @package    block_glossary_export_to_quiz
  * @copyright  Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,11 +34,17 @@ global $SESSION, $DB;
 
 require_once("../../config.php");
 require_once("../../lib/filelib.php");
+        /*$usecase = $this->config->usecase;
+        $answernumbering = $this->config->answernumbering;
+        $shuffleanswers = $this->config->shuffleanswers;*/
 
 $id = required_param('id', PARAM_INT);      // Course Module ID.
 $cat = optional_param('cat', 0, PARAM_ALPHANUM);
 $limitnum = optional_param('limitnum', '', PARAM_ALPHANUM);
 $nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
+$usecase = optional_param('usecase', '', PARAM_ALPHANUM);
+$answernumbering = optional_param('answernumbering', '', PARAM_ALPHANUM);
+$shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
 $numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
 $entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
@@ -140,21 +145,15 @@ $context = context_module::instance($cm->id);
 if ( $entries = $DB->get_records_sql($sql) ) {
     switch ($questiontype) {
         case 'multichoice':
-            $answernumbering = $questiontypeparams[1];
             $concepts = array();
             foreach ($entries as $entry) {
                 $concepts[] = $entry->concept;
             }
             break;
-        case 'shortanswer':
-            $usecase = $questiontypeparams[1]!== '';
-            break;
         case 'matching':
-            $shuffle = $questiontypeparams[1] !== '';
             $questiontext = get_string('matchinstructions', 'block_glossary_export_to_quiz');
             break;
         case 'ddwtos':
-            $shuffle = $questiontypeparams[1] !== '';
             $instructions = get_string('ddwtosinstructions', 'block_glossary_export_to_quiz');
             break;
     }
@@ -178,7 +177,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $expout .= "    <questiontext format=\"$qtformat\">\n";
                 $expout .= writetext( $questiontext );
                 $expout .= "    </questiontext>\n";
-                $expout .= "    <shuffleanswers>" .$shuffle . "</shuffleanswers>\n";
+                $expout .= "    <shuffleanswers>" .$shuffleanswers . "</shuffleanswers>\n";
                 $questionscounter++;                
             }                      
             $concept = trusttext_strip($entry->concept);
@@ -209,7 +208,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 // Write question text and dragboxes.
                 $expout .= writetext($questiontext, 3);
                 $expout .= "    </questiontext>\n"; 
-                $expout .= "    <shuffleanswers>" .$shuffle . "</shuffleanswers>\n";     
+                $expout .= "    <shuffleanswers>" .$shuffleanswers . "</shuffleanswers>\n";
                 for ($j = 0; $j < $nbchoices; $j++) {
                     $expout .= "      <dragbox>\n";
                     $expout .= writetext($dragboxconcept[$j], $nbchoices);
@@ -245,7 +244,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $expout .= writetext($dragboxconcept[$j], $nbchoices);
             $expout .= "      </dragbox>\n";
         }
-        $expout .= "    <shuffleanswers>" .$shuffle . "</shuffleanswers>\n";
+        $expout .= "    <shuffleanswers>" .$shuffleanswers . "</shuffleanswers>\n";
         $expout .= "</question>\n";                   
         
     } else {

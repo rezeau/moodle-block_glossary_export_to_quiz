@@ -17,8 +17,7 @@
 /**
  * Version details
  *
- * @package    block
- * @subpackage glossary_export_to_quiz
+ * @package    block_glossary_export_to_quiz
  * @copyright  Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -113,6 +112,17 @@ class block_glossary_export_to_quiz extends block_base {
                 get_string('allentries', 'block_glossary_export_to_quiz');
         }
         $limitnum = $this->config->limitnum;
+        $usecase = $this->config->usecase;
+        $stranswernumbering = array(
+                    0 => 'abc',
+                    1 => 'ABCD',
+                    2 => '123',
+                    3 => 'iii',
+                    4 => 'IIII',
+                    5 => 'none'
+                );
+        $answernumbering = $stranswernumbering[$this->config->answernumbering];
+        $shuffleanswers = $this->config->shuffleanswers;
 
         if ($limitnum) {
             $numentries = min($limitnum, $entriescount);
@@ -122,8 +132,8 @@ class block_glossary_export_to_quiz extends block_base {
         }
 
         $qtype = $this->config->questiontype;
-        if ($qtype /*< 3 || $qtype*/ > 4) { // matching or drag&drop question
-            $nbchoices = $this->config->nbchoices;
+        $nbchoices = $this->config->nbchoices;
+        if ($qtype > 1) { // matching or drag&drop question
             $limitnum = floor ($numentries / $nbchoices) * $nbchoices;
             $numentries = $limitnum; 
             $numquestions = $limitnum / $nbchoices;
@@ -140,33 +150,20 @@ class block_glossary_export_to_quiz extends block_base {
         $type[2] = get_string('firstmodified', 'block_glossary_export_to_quiz');
         $type[3] = get_string('random', 'block_glossary_export_to_quiz');
 
-        $questiontype[0] = 'multichoice_abc';
-        $questiontype[1] = 'multichoice_123';
-        $questiontype[2] = 'multichoice_none';
-        $questiontype[3] = 'shortanswer_';
-        $questiontype[4] = 'shortanswer_usecase';
-        $questiontype[5] = 'matching_';
-        $questiontype[6] = 'matching_shuffleanswers';
-        $questiontype[7] = 'ddwtos_';
-        $questiontype[8] = 'ddwtos_shuffleanswers';
+        $questiontype[0] = 'shortanswer';
+        $questiontype[1] = 'multichoice';
+        $questiontype[2] = 'matching';
+        $questiontype[3] = 'ddwtos';
         
         $strquestiontypes = array(
-            0 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingabc', 'qtype_multichoice').')',
-            1 => get_string('multichoice', 'quiz').' ('.get_string('answernumbering123', 'qtype_multichoice').')',
-            2 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingnone', 'qtype_multichoice').')',
-            3 => get_string('shortanswer', 'quiz').' ('.get_string('caseinsensitive', 'block_glossary_export_to_quiz').')',
-            4 => get_string('shortanswer', 'quiz').' ('.get_string('casesensitive', 'block_glossary_export_to_quiz').')',
-            5 => get_string('match', 'quiz'),
-            6 => get_string('match', 'quiz').' ('.get_string('shuffleanswers', 'quiz').')',
-            7 => get_string('ddwtos', 'block_glossary_export_to_quiz'),
-            8 => get_string('ddwtos', 'block_glossary_export_to_quiz').' ('.get_string('shuffleanswers', 'quiz').')'
+            0 => get_string('shortanswer', 'quiz'),
+            1 => get_string('multichoice', 'quiz'),
+            2 => get_string('match', 'quiz'),
+            3 => get_string('ddwtos', 'block_glossary_export_to_quiz')
         );
 
         $questiontype = $questiontype[$this->config->questiontype];
         $stractualquestiontype = $strquestiontypes[$this->config->questiontype];
-        $actualquestiontypeparams = explode('_', $questiontype);
-        $actualquestiontype = $actualquestiontypeparams[0];
-        $actualquestionparam = $actualquestiontypeparams[1];
         $strsortorder = '<b>'.get_string('sortingorder', 'block_glossary_export_to_quiz').'</b>: '.$type[$sortorder];
         $strquestiontype = '<b>'.get_string('questiontype', 'block_glossary_export_to_quiz').'</b> '.$stractualquestiontype;
         $cm = get_coursemodule_from_instance("glossary", $glossaryid);
@@ -180,7 +177,8 @@ class block_glossary_export_to_quiz extends block_base {
         $this->content->footer = '<a title="'.$title.'" href='
             .$CFG->wwwroot.'/blocks/glossary_export_to_quiz/export_to_quiz.php?id='
             .$cmid.'&amp;cat='.$categoryid.'&amp;limitnum='.$limitnum.'&amp;questiontype='.$questiontype
-            .'&amp;sortorder='.$sortorder.'&amp;entriescount='.$numentries.'&amp;nbchoices='.$nbchoices.'&amp;numquestions='.$numquestions.'>'
+            .'&amp;sortorder='.$sortorder.'&amp;usecase='.$usecase.'&amp;nbchoices='.$nbchoices
+            .'&amp;numquestions='.$numquestions.'&amp;answernumbering='.$answernumbering.'&amp;shuffleanswers='.$shuffleanswers.'>'
             .'<b>'.$strnumentries.'</b></a>';
             return $this->content;
     }

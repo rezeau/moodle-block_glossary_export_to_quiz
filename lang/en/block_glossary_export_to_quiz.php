@@ -17,8 +17,7 @@
 /**
  * Strings for component 'glossary_export_to_quiz', language 'en', branch 'MOODLE_25_STABLE'
  *
- * @package    block
- * @subpackage glossary_export_to_quiz
+ * @package    block_glossary_export_to_quiz
  * @copyright  Joseph Rézeau - moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,41 +37,23 @@ $string['limitnum'] = 'Maximum number of entries to export';
 $string['limitnum_help'] = 'Leave this field at its default "0" value to export ALL entries from selected Glossary or Category.
 This option can be useful for exporting a limited number of entries from very large glossaries.';
 $string['multichoice'] = 'Multiple Choice';
-$string['notenoughentriesavailable'] = 'Not enough entries available ({$a}) for Multichoice questions (minimum 4 entries needed).';
-$string['notenoughentriesselected'] = 'Not enough entries selected ({$a}) for Multichoice questions (minimum 4 entries needed).';
+$string['notenoughentriesavailable'] = 'Not enough entries available ({$a->numentries}) for Multichoice questions (minimum {$a->nbchoices} entries needed).';
+$string['notenoughentriesselected'] = 'Not enough entries selected ({$a->numentries}) for Multichoice questions (minimum {$a->nbchoices} entries needed).';
 $string['numentries'] = 'Export {$a} entries';
 $string['numquestions'] = ' and create {$a} questions';
 $string['noglossaries'] = 'No glossaries in this course';
-$string['nolink'] = 'Remove glossary autolinks';
 $string['notyetconfigured'] = 'Please <b>Turn editing on</b> to configure this block.';
 $string['notyetconfiguredediting'] = 'Please click the Actions icon to configure this block.';
 $string['pluginname'] = 'Export Glossary to Quiz';
 $string['pluginname_help'] = 'Right-click the <b>More Help</b> link to view the Moodle Documentation Wiki.';
 $string['pluginname_link'] = 'block/glossary_export_to_quiz/edit';
 $string['questiontype'] = 'Question type:';
-$string['questiontype_help'] = 'Glossary entries can be exported to the Quiz Questions bank either as multiple choice or short answer questions.
-Multiple choice questions will consist of the following elements:
-
-* question text = glossary entry definition
-* correct answer = glossary entry concept
-* distracters = 3 glossary entry concepts randomly selected from the glossary (or glossary category) that you have selected.
-
-Short answer questions
-
-* Case insensitive. Student responses will be accepted as correct regardless of the original glossary entry concept case (uppercase or lowercase).
-** Example: original entry "Moodle". Accepted correct responses: "Moodle", "moodle".
-* Case sensitive. Student responses will be only be accepted as correct it the case of the original glossary entry concept is used..
-** Example: original entry "Moodle". Accepted correct response: "Moodle".';
-$string['questionoptions'] = 'Question options:';
-$string['questionoptions_help'] = 'Help for question options';
+$string['questiontype_help'] = 'Select which question type you want to export the glossary\'s entries to.';
 $string['random'] = 'Randomly';
 $string['selectglossary'] = 'Select glossary to export from';
 $string['selectglossary_help'] = 'Use the dropdown list to select the glossary that you want to use to export its entries to the quiz questions bank.
 If that glossary contains categories, you can select only one category to export its entries.
 To cancel your choice or to reset the block, simply leave the dropdown list on the Choose... position.';
-$string['shortanswer'] = 'Short answer';
-$string['caseinsensitive'] = 'Case insensitive';
-$string['casesensitive'] = 'Case sensitive';
 $string['sortingorder'] = 'Sorting Order';
 $string['sortingorder_help'] = 'Use this setting to determine how the exported glossary entries will be ordered when you import them to your questions data bank.
 This can be used, in combination with the Maximum number of entries, for creating a quiz to test the latest entries to your glossary (especially a fairly large one). ';
@@ -80,6 +61,15 @@ $string['matchinstructions'] = 'Match the definitions and the concepts';
 $string['ddwtos'] = 'Drag and drop into text';
 $string['ddwtosinstructions'] = 'Drag each concept label to match its definition';
 $string['nbchoices'] = 'Number of choices';
-$string['nbchoices_help'] = 'Select how many choices you want to make available. 
+$string['nbchoices_help'] = 'Select how many choices/answers you want to make available.
 
 Does not apply to the shortanswer question type.';
+$string['shuffleanswers'] = 'Shuffle answers';
+$string['shuffleanswers_help'] = 'If enabled, the order of the choices/answers is randomly shuffled for each attempt.
+
+Does not apply to the shortanswer question type.';
+$string['usecase'] = 'Case sensitivity';
+$string['usecase_help'] = 'Applies to the shortanswer question type only.';
+$string['answernumbering'] = 'Number the choices?';
+$string['answernumbering_help'] = 'Applies to the multichoice question type only.';
+$string['privacy:metadata'] = 'The Export Glossary to Quiz block does not store any personal data.';

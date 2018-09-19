@@ -17,19 +17,19 @@
 /**
  * Privacy Subsystem implementation for block_feedback.
  *
- * @package    block_feedback
- * @copyright  2018 Zig Tan <zig@moodle.com>
+ * @package    block_glossary_export_to_quiz
+ * @copyright  2018 Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace block_feedback\privacy;
+namespace block_glossary_export_to_quiz\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Privacy Subsystem for block_feedback implementing null_provider.
+ * Privacy Subsystem for block_glossary_export_to_quiz implementing null_provider.
  *
- * @copyright  2018 Zig Tan <zig@moodle.com>
+ * @copyright  2018 Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {

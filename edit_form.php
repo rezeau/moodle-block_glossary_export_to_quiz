@@ -17,8 +17,7 @@
 /**
  * Version details
  *
- * @package    block
- * @subpackage glossary_export_to_quiz
+ * @package    block_glossary_export_to_quiz
  * @copyright  Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -110,16 +109,11 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 // And select question types to put in dropdown box.
                 
                 $strquestiontypes = array(
-                    0 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingabc', 'qtype_multichoice').')',
-                    1 => get_string('multichoice', 'quiz').' ('.get_string('answernumbering123', 'qtype_multichoice').')',
-                    2 => get_string('multichoice', 'quiz').' ('.get_string('answernumberingnone', 'qtype_multichoice').')',                                                 
-                    3 => get_string('shortanswer', 'quiz').' ('.get_string('caseinsensitive', 'block_glossary_export_to_quiz').')',
-                    4 => get_string('shortanswer', 'quiz').' ('.get_string('casesensitive', 'block_glossary_export_to_quiz').')',
-                    5 => get_string('match', 'quiz'),
-                    6 => get_string('match', 'quiz').' ('.get_string('shuffleanswers', 'quiz').')',
-                    7 => get_string('ddwtos', 'block_glossary_export_to_quiz'),
-                    8 => get_string('ddwtos', 'block_glossary_export_to_quiz').' ('.get_string('shuffleanswers', 'quiz').')'                    
-                );             
+                    0 => get_string('shortanswer', 'quiz'),
+                    1 => get_string('multichoice', 'quiz'),
+                    2 => get_string('match', 'quiz'),
+                    3 => get_string('ddwtos', 'block_glossary_export_to_quiz')
+                );
                 $mform->addElement('select', 'config_questiontype',
                                 get_string('questiontype', 'block_glossary_export_to_quiz'), $strquestiontypes);
                 $mform->addHelpButton('config_questiontype', 'questiontype', 'block_glossary_export_to_quiz');
@@ -130,11 +124,41 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     5 => 5,
                     6 => 6,
                     7 => 7,
-                    8 => 8
+                    8 => 8,
+                    9 => 9,
+                    10 => 10
                 );
                 $mform->addElement('select', 'config_nbchoices',
                     get_string('nbchoices', 'block_glossary_export_to_quiz'), $nbchoices);
-                $mform->addHelpButton('config_nbchoices', 'nbchoices', 'block_glossary_export_to_quiz');            
+                $mform->addHelpButton('config_nbchoices', 'nbchoices', 'block_glossary_export_to_quiz');
+
+                // Shuffle within questions.
+                $mform->addElement('selectyesno', 'config_shuffleanswers',
+                    get_string('shuffleanswers', 'block_glossary_export_to_quiz'));
+                $mform->addHelpButton('config_shuffleanswers', 'shuffleanswers', 'block_glossary_export_to_quiz');
+                $mform->setDefault('config_shuffleanswers', 1);
+
+                // Answer numbering for multichoice questions.
+                $answernumbering = array(
+                    0 => get_string('answernumberingabc', 'qtype_multichoice'),
+                    1 => get_string('answernumberingABCD', 'qtype_multichoice'),
+                    2 => get_string('answernumbering123', 'qtype_multichoice'),
+                    3 => get_string('answernumberingiii', 'qtype_multichoice'),
+                    4 => get_string('answernumberingIIII', 'qtype_multichoice'),
+                    5 => get_string('answernumberingnone', 'qtype_multichoice')
+                );
+                $mform->addElement('select', 'config_answernumbering',
+                    get_string('answernumbering', 'qtype_multichoice'), $answernumbering);
+                $mform->addHelpButton('config_answernumbering', 'answernumbering', 'block_glossary_export_to_quiz');
+
+                // Short answer usecase
+                $menu = array(
+                    get_string('caseno', 'qtype_shortanswer'),
+                    get_string('caseyes', 'qtype_shortanswer')
+                );
+                $mform->addElement('select', 'config_usecase',
+                    get_string('casesensitive', 'qtype_shortanswer'), $menu);
+                $mform->addHelpButton('config_usecase', 'usecase', 'block_glossary_export_to_quiz');
             }
         }
     }
@@ -157,7 +181,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         }
 
         $nbchoices = $data['config_nbchoices'];
-        if ($questiontype < 3 || $questiontype > 4) {
+        if ($questiontype == 1) {
             if ($maxentries < $nbchoices || $glossarynumentries < $nbchoices) {
                 if ($maxentries < $nbchoices ) {
                     $errormsg = 'notenoughentriesselected';
@@ -167,7 +191,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     $errormsg = 'notenoughentriesavailable';
                     $numentries = $glossarynumentries;
                 }
-                $errors['config_limitnum'] = get_string($errormsg, 'block_glossary_export_to_quiz', $numentries);
+                $errors['config_limitnum'] = get_string($errormsg, 'block_glossary_export_to_quiz',  ['numentries' => $numentries, 'nbchoices' => $nbchoices]);
             }
         }
         
