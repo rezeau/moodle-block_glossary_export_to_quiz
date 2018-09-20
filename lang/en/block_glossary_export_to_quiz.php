@@ -26,7 +26,7 @@ $string['allentries'] = 'All entries';
 $string['glossary_export_to_quiz:addinstance'] = 'Add a new glossary_export_to_quiz block';
 $string['glossary_export_to_quiz:myaddinstance'] = 'Add a new glossary_export_to_quiz block to the My Moodle page';
 $string['clicktoexport'] = 'Click to export this glossary\'s entries to quiz (XML)';
-$string['concept'] = 'Alphabetical order';
+$string['alphabeticalorder'] = 'Alphabetical order';
 $string['emptyglossaries'] = 'This course glossaries are empty (no entries)';
 $string['emptyglossary'] = 'This course glossary is empty (no entries)';
 $string['exportentriestoxml'] = 'Export entries to Quiz (XML)';
@@ -36,7 +36,6 @@ $string['lastmodified'] = 'Most recent entries first';
 $string['limitnum'] = 'Maximum number of entries to export';
 $string['limitnum_help'] = 'Leave this field at its default "0" value to export ALL entries from selected Glossary or Category.
 This option can be useful for exporting a limited number of entries from very large glossaries.';
-$string['multichoice'] = 'Multiple Choice';
 $string['notenoughentriesavailable'] = 'Not enough entries available ({$a->numentries}) for Multichoice questions (minimum {$a->nbchoices} entries needed).';
 $string['notenoughentriesselected'] = 'Not enough entries selected ({$a->numentries}) for Multichoice questions (minimum {$a->nbchoices} entries needed).';
 $string['numentries'] = 'Export {$a} entries';
@@ -47,7 +46,6 @@ $string['notyetconfiguredediting'] = 'Please click the Actions icon to configure
 $string['pluginname'] = 'Export Glossary to Quiz';
 $string['pluginname_help'] = 'Right-click the <b>More Help</b> link to view the Moodle Documentation Wiki.';
 $string['pluginname_link'] = 'block/glossary_export_to_quiz/edit';
-$string['questiontype'] = 'Question type:';
 $string['questiontype_help'] = 'Select which question type you want to export the glossary\'s entries to.';
 $string['random'] = 'Randomly';
 $string['selectglossary'] = 'Select glossary to export from';
@@ -58,18 +56,9 @@ $string['sortingorder'] = 'Sorting Order';
 $string['sortingorder_help'] = 'Use this setting to determine how the exported glossary entries will be ordered when you import them to your questions data bank.
 This can be used, in combination with the Maximum number of entries, for creating a quiz to test the latest entries to your glossary (especially a fairly large one). ';
 $string['matchinstructions'] = 'Match the definitions and the concepts';
-$string['ddwtos'] = 'Drag and drop into text';
 $string['ddwtosinstructions'] = 'Drag each concept label to match its definition';
 $string['nbchoices'] = 'Number of choices';
-$string['nbchoices_help'] = 'Select how many choices/answers you want to make available.
-
-Does not apply to the shortanswer question type.';
+$string['nbchoices_help'] = 'Select how many choices/answers you want to make available.';
 $string['shuffleanswers'] = 'Shuffle answers';
-$string['shuffleanswers_help'] = 'If enabled, the order of the choices/answers is randomly shuffled for each attempt.
-
-Does not apply to the shortanswer question type.';
-$string['usecase'] = 'Case sensitivity';
-$string['usecase_help'] = 'Applies to the shortanswer question type only.';
-$string['answernumbering'] = 'Number the choices?';
-$string['answernumbering_help'] = 'Applies to the multichoice question type only.';
+$string['shuffleanswers_help'] = 'If enabled, the order of the choices/answers is randomly shuffled for each attempt.';
 $string['privacy:metadata'] = 'The Export Glossary to Quiz block does not store any personal data.';

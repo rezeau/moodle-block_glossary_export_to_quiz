@@ -38,8 +38,8 @@ $usecase = optional_param('usecase', '', PARAM_ALPHANUM);
 $answernumbering = optional_param('answernumbering', '', PARAM_ALPHANUM);
 $shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
 $numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
-$questiontype =  optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
-$url = new moodle_url('/mod/glossary/export.php', array('id'=>$id));
+$questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
+$url = new moodle_url('/mod/glossary/export.php', array('id' => $id));
 if ($cat !== 0) {
     $url->param('cat', $cat);
 }
@@ -50,11 +50,11 @@ if (! $cm = get_coursemodule_from_id('glossary', $id)) {
     print_error('invalidcoursemodule');
 }
 
-if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
+if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
     print_error('coursemisconf');
 }
 
-if (! $glossary = $DB->get_record("glossary", array("id"=>$cm->instance))) {
+if (! $glossary = $DB->get_record("glossary", array("id" => $cm->instance))) {
     print_error('invalidid', 'glossary');
 }
 
