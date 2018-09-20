@@ -162,7 +162,7 @@ class block_glossary_export_to_quiz extends block_base {
             $numentries).get_string('numquestions', 'block_glossary_export_to_quiz', $numquestions);
 
         $sortorder = $this->config->sortingorder;
-        $type[0] = get_string('sortingorder', 'block_glossary_export_to_quiz');
+        $type[0] = get_string('concept', 'block_glossary_export_to_quiz');
         $type[1] = get_string('lastmodified', 'block_glossary_export_to_quiz');
         $type[2] = get_string('firstmodified', 'block_glossary_export_to_quiz');
         $type[3] = get_string('random', 'block_glossary_export_to_quiz');

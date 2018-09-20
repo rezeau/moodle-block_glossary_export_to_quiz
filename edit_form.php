@@ -94,7 +94,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 // And select sortorder types to put in dropdown box.
                 $mform->addHelpButton('selectglossary', 'selectglossary', 'block_glossary_export_to_quiz');
                 $types = array(
-                    0 => get_string('alphabeticalorder', 'block_glossary_export_to_quiz'),
+                    0 => get_string('concept', 'block_glossary_export_to_quiz'),
                     1 => get_string('lastmodified', 'block_glossary_export_to_quiz'),
                     2 => get_string('firstmodified', 'block_glossary_export_to_quiz'),
                     3 => get_string('random', 'block_glossary_export_to_quiz')
