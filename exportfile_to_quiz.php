@@ -269,8 +269,8 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                             unset($concepts2[$key]);
                         }
                     }
-                    $randkeys = array_rand($concepts2, 3);
-                    for ($i = 0; $i < 4; $i++) {
+                    $randkeys = array_rand($concepts2, $nbchoices);
+                    for ($i = 0; $i < $nbchoices + 1; $i++) {
                         if ($i === 0) {
                             $percent = 100;
                             $expout .= "      <answer fraction=\"$percent\">\n";

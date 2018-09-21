@@ -135,7 +135,10 @@ class block_glossary_export_to_quiz extends block_base {
                     4 => 'IIII',
                     5 => 'none'
                 );
+                $nbchoices = $this->config->nbchoices - 1;
                 $answernumbering = $stranswernumbering[$this->config->answernumbering];
+                $shuffleanswers = $this->config->shuffleanswers;
+                break;
             case 3:
             case 4:
                 $nbchoices = $this->config->nbchoices;
@@ -149,13 +152,12 @@ class block_glossary_export_to_quiz extends block_base {
         } else {
             $numentries = $entriescount;
         }
-        if ($qtype > 1) { // Matching or drag&drop question.
+        if ($qtype > 2) { // Matching or drag&drop question.
             $limitnum = floor ($numentries / $nbchoices) * $nbchoices;
             $numentries = $limitnum;
             $numquestions = $limitnum / $nbchoices;
         } else {
             $numquestions = $numentries;
-            $nbchoices = '';
         }
 
         $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz',

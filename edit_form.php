@@ -197,7 +197,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         }
         if ($questiontype > 1) {
             $nbchoices = $data['config_nbchoices'];
-            if ($questiontype == 2) {
+            if ($questiontype > 1) { // Multichoice
                 if ($maxentries < $nbchoices || $glossarynumentries < $nbchoices) {
                     if ($maxentries < $nbchoices ) {
                         $errormsg = 'notenoughentriesselected';

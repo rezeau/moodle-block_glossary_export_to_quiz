@@ -40,8 +40,8 @@ This option can be useful for exporting a limited number of entries from very la
 $string['matchinstructions'] = 'Match the definitions and the concepts';
 $string['nbchoices'] = 'Number of choices';
 $string['nbchoices_help'] = 'Select how many choices/answers you want to make available.';
-$string['notenoughentriesavailable'] = 'Not enough entries available ({$a->numentries}) for Multichoice questions (minimum {$a->nbchoices} entries needed).';
-$string['notenoughentriesselected'] = 'Not enough entries selected ({$a->numentries}) for Multichoice questions (minimum {$a->nbchoices} entries needed).';
+$string['notenoughentriesavailable'] = 'Not enough entries available ({$a->numentries}) for this question type (minimum {$a->nbchoices} entries needed).';
+$string['notenoughentriesselected'] = 'Not enough entries selected ({$a->numentries}) for this question type (minimum {$a->nbchoices} entries needed).';
 $string['numentries'] = 'Export {$a} entries';
 $string['numquestions'] = ' and create {$a} questions';
 $string['noglossaries'] = 'No glossaries in this course';
