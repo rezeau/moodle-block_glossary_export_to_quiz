@@ -71,7 +71,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($strexportentries);
 echo $OUTPUT->box_start('glossarydisplay generalbox');
 
-echo '
+echo ('
     <form action="exportfile_to_quiz.php" method="post">
     <table border="0" cellpadding="6" cellspacing="6" width="100%">
     <tr><td align="center">
@@ -93,7 +93,7 @@ echo '
     <input type="hidden" name="numquestions" value='.$numquestions.' />
     </div>
     </form>
-';
+');
 
     $courseurl = new moodle_url("/course/view.php", array('id' => $course->id));
     echo html_writer::start_tag('div', array('class' => 'buttons'));
