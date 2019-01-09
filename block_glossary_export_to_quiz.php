@@ -24,19 +24,44 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Block glossary_export_to_quiz definition.
+ *
+ * This block can be added to a course page to enable a teacher to export
+ * glossary entries to various question types.
+ *
+ * @package    block_glossary_export_to_quiz
+ * @copyright  Joseph Rézeau <moodle@rezeau.org>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_glossary_export_to_quiz extends block_base {
+
+    /**
+     * Core function used to initialize the block.
+     */
     public function init() {
         global $SESSION;
         $this->title = get_string('pluginname', 'block_glossary_export_to_quiz');
     }
 
+     /**
+      * Core function, specifies where the block can be used.
+      * @return array
+      */
     public function applicable_formats() {
         return array('all' => true);
     }
 
+    /**
+     * This function is called on your subclass right after an instance is loaded
+     * Use this function to act on instance data just after it's loaded and before anything else is done
+     * For instance: if your block will have different title's depending on location (site, course, blog, etc)
+     */
     public function specialization() {
         global $CFG, $DB, $OUTPUT, $PAGE;
         require_once($CFG->libdir . '/filelib.php');
+        // Needed for getting available question types.
+        require_once($CFG->libdir . '/questionlib.php');
         // Load userdefined title and make sure it's never empty.
         if (empty($this->config->title)) {
             $this->title = get_string('pluginname', 'block_glossary_export_to_quiz');
@@ -46,13 +71,23 @@ class block_glossary_export_to_quiz extends block_base {
         $course = $this->page->course;
         $this->course = $course;
     }
-
+    /**
+     * Allows the block to be added multiple times to a single page
+     * @return boolean
+     */
     public function instance_allow_multiple() {
         // Are you going to allow multiple instances of each block?
         // If yes, then it is assumed that the block WILL USE per-instance configuration.
         return false;
     }
 
+    /**
+     * Parent class version of this function simply returns NULL
+     * This should be implemented by the derived class to return
+     * the content object.
+     *
+     * @return stdObject
+     */
     public function get_content() {
         global $USER, $CFG, $DB, $PAGE, $SESSION;
         $editing = $PAGE->user_is_editing();
@@ -103,7 +138,12 @@ class block_glossary_export_to_quiz extends block_base {
         if (isset ($categories[1]) && $categories[1] != 0) {
             $categoryid = $categories[1];
             $category = $DB->get_record('glossary_categories', array('id' => $categoryid));
-            $entriescount = $DB->count_records ("glossary_entries_categories", array ('categoryid' => $category->id) );
+            $sql = "SELECT COUNT(*) "
+                ." FROM mdl_glossary_entries ge , mdl_glossary_entries_categories c "
+                . " WHERE ge.glossaryid = $glossaryid "
+                . " AND ge.approved = 1 AND ge.id = c.entryid "
+                . " AND c.categoryid = $categoryid";
+            $entriescount = $DB->count_records_sql($sql);
             $categoryname = '<b>'.get_string('category', 'glossary').'</b>: <em>'.
                 $category->name.'</em>';
         } else {
@@ -117,16 +157,19 @@ class block_glossary_export_to_quiz extends block_base {
         $qtype = $this->config->questiontype;
         // Initialize options.
         $usecase = '';
+        $exportmediafiles = $this->config->exportmediafiles;
+        $answerdisplay = '';
+        $extrawronganswer = $this->config->extrawronganswer;
         $shuffleanswers = '';
         $answernumbering = '';
         $nbchoices = '';
 
         switch ($qtype) {
-            case 1:
+            case 1:     // Type shortanswer.
                 $usecase = $this->config->usecase;
 
                 break;
-            case 2:
+            case 2:     // Type multichoice.
                 $stranswernumbering = array(
                     0 => 'abc',
                     1 => 'ABCD',
@@ -139,10 +182,14 @@ class block_glossary_export_to_quiz extends block_base {
                 $answernumbering = $stranswernumbering[$this->config->answernumbering];
                 $shuffleanswers = $this->config->shuffleanswers;
                 break;
-            case 3:
-            case 4:
+            case 3:      // Type matching.
+            case 4:      // Type drag and drop into text.
                 $nbchoices = $this->config->nbchoices;
                 $shuffleanswers = $this->config->shuffleanswers;
+            case 5:     // Type gapfill.
+                $nbchoices = $this->config->nbchoices;
+                $shuffleanswers = $this->config->shuffleanswers;
+                $answerdisplay = $this->config->answerdisplay;
             break;
         }
 
@@ -153,7 +200,8 @@ class block_glossary_export_to_quiz extends block_base {
             $numentries = $entriescount;
         }
         if ($qtype > 2) { // Matching or drag&drop question.
-            $limitnum = floor ($numentries / $nbchoices) * $nbchoices;
+            $nbchoices += $extrawronganswer;
+            $limitnum = floor ($numentries / $nbchoices ) * $nbchoices;
             $numentries = $limitnum;
             $numquestions = $limitnum / $nbchoices;
         } else {
@@ -180,6 +228,18 @@ class block_glossary_export_to_quiz extends block_base {
             3 => get_string('pluginname', 'qtype_match'),
             4 => get_string('pluginname', 'qtype_ddwtos')
         );
+        // JR DECEMBER 2018 added the gapfill question type.
+        $createabletypes = question_bank::get_creatable_qtypes();
+        if (array_key_exists('gapfill', $createabletypes)) {
+            $questiontype[5] = 'gapfill';
+            $strquestiontypes[5] = get_string('pluginname', 'qtype_gapfill');
+        };
+
+        // Just in case a new question type has been removed after creating an export glossary.
+        if (!$questiontype[$this->config->questiontype]) {
+            $this->content->footer = '';
+            return $this->content;
+        }
 
         $questiontype = $questiontype[$this->config->questiontype];
         $stractualquestiontype = $strquestiontypes[$this->config->questiontype];
@@ -196,8 +256,10 @@ class block_glossary_export_to_quiz extends block_base {
         $this->content->footer = '<a title="'.$title.'" href='
             .$CFG->wwwroot.'/blocks/glossary_export_to_quiz/export_to_quiz.php?id='
             .$cmid.'&amp;cat='.$categoryid.'&amp;limitnum='.$limitnum.'&amp;questiontype='.$questiontype
-            .'&amp;sortorder='.$sortorder.'&amp;usecase='.$usecase.'&amp;nbchoices='.$nbchoices
-            .'&amp;numquestions='.$numquestions.'&amp;answernumbering='.$answernumbering.'&amp;shuffleanswers='.$shuffleanswers.'>'
+            .'&amp;sortorder='.$sortorder.'&amp;usecase='.$usecase.'&amp;exportmediafiles='.$exportmediafiles
+            .'&amp;nbchoices='.$nbchoices.'&amp;extrawronganswer='.$extrawronganswer
+            .'&amp;numquestions='.$numquestions.'&amp;answernumbering='.$answernumbering
+            .'&amp;shuffleanswers='.$shuffleanswers.'&amp;answerdisplay='.$answerdisplay.'>'
             .'<b>'.$strnumentries.'</b></a>';
         return $this->content;
     }

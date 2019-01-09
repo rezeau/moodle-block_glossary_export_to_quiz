@@ -62,3 +62,9 @@ $string['sortingorder'] = 'Sorting Order';
 $string['sortingorder_help'] = 'Use this setting to determine how the exported glossary entries will be ordered when you import them to your questions data bank.
 This can be used, in combination with the Maximum number of entries, for creating a quiz to test the latest entries to your glossary (especially a fairly large one). ';
 $string['privacy:metadata'] = 'The Export Glossary to Quiz block does not store any personal data.';
+$string['exportmediafiles'] = 'Export images and audio/video files?';
+$string['exportmediafiles_help'] = 'Do you want to export the images/audio/video which may have been inserted into this glossary\'s definitions?
+Some question types are not really compatible with some media elements.';
+$string['extrawronganswer'] = 'Add one extra wrong answer?';
+$string['extrawronganswer_help'] = 'Do you want to add an extra wrong answer/distracter to each of your questions?';
+$string['gapfillddinstructions'] = 'Select from each dropdown list the concept which matches its definition';

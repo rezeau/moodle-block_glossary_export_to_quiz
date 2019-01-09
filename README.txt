@@ -1,5 +1,9 @@
 Release notes
 --------------------------------
+Version 3.6.0 release 2018120900 for Moodle 3.6
+- Added export to Gapfill add-on question type (if installed) with 3 options:
+    gapfill, dragdrop, dropdown and fixed gap size
+--------------------------------
 Version 3.5.0 release 2018092000 for Moodle 3.5
 - Added 2 more question types for glossary entries export: Match and Drag & drop into text.
 - Added 3 separate options for questions: case sensitive; number of answers; shuffle choices/items.

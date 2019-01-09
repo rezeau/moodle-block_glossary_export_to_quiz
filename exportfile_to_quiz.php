@@ -27,7 +27,9 @@
 
 require_once("../../config.php");
 require_once("../../lib/filelib.php");
-global $SESSION, $DB;
+global $SESSION, $DB, $mediafiles;
+$SESSION->block_glossary_export_to_quiz->status = '';
+$mediafiles = array();
 
 $id = required_param('id', PARAM_INT);      // Course Module ID.
 $cat = optional_param('cat', 0, PARAM_ALPHANUM);
@@ -36,10 +38,13 @@ $nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
 $usecase = optional_param('usecase', '', PARAM_ALPHANUM);
 $answernumbering = optional_param('answernumbering', '', PARAM_ALPHANUM);
 $shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
+$answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
 $numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
 $entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
 $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
+$exportmediafiles = optional_param('exportmediafiles', '', PARAM_ALPHANUM);
+$extrawronganswer = optional_param('extrawronganswer', '', PARAM_ALPHANUM);
 
 if (! $cm = get_coursemodule_from_id('glossary', $id)) {
     error("Course Module ID was incorrect");
@@ -83,7 +88,6 @@ if ($limitnum) {
     $limit = "LIMIT  $limitnum ";
 } else {
     $limit = '';
-    $limitnum = $entriescount;
 }
 
 $catfrom = "";
@@ -97,7 +101,8 @@ if ($cat) {
     $catwhere = "and ge.id = c.entryid and c.categoryid = $cat";
 }
 
-$sql = "SELECT * FROM ".$CFG->prefix."glossary_entries ge $catfrom "
+$sql = "SELECT ge.id, ge.concept, ge.definition "
+." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
 . "WHERE ge.glossaryid = $glossary->id "
 . "AND ge.approved = 1 "
 . "$catwhere "
@@ -124,10 +129,13 @@ switch ($questiontype) {
     case 'ddwtos':
         $questiontypeabbr = ' DRAGDROPTEXT';
         break;
+    case 'gapfill':
+        $questiontypeabbr = ' GAPFILL';
+        break;
 }
 
 $giftcategoryname .= ' '.$numquestions.$questiontypeabbr;
-$filename = clean_filename(strip_tags(format_string($giftcategoryname, true)).' questions.xml');
+$filename = clean_filename(format_string($giftcategoryname, true).' questions.xml');
 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
 
 $categorypath = writetext( $giftcategoryname );
@@ -139,6 +147,7 @@ $expout .= "  </question>\n";
 $context = context_module::instance($cm->id);
 
 if ( $entries = $DB->get_records_sql($sql) ) {
+    $instructions = '';
     switch ($questiontype) {
         case 'multichoice':
             $concepts = array();
@@ -147,10 +156,18 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             }
             break;
         case 'matching':
-            $questiontext = get_string('matchinstructions', 'block_glossary_export_to_quiz');
+            $instructions = get_string('matchinstructions', 'block_glossary_export_to_quiz');
             break;
-        case 'ddwtos':
-            $instructions = get_string('ddwtosinstructions', 'block_glossary_export_to_quiz');
+        case 'ddwtos': $instructions = get_string('ddwtosinstructions', 'block_glossary_export_to_quiz');
+        case 'gapfill':
+            switch ($answerdisplay) {
+                case 'dragdrop':
+                    $instructions = get_string('ddwtosinstructions', 'block_glossary_export_to_quiz');
+                    break;
+                case 'dropdown':
+                    $instructions = get_string('gapfillddinstructions', 'block_glossary_export_to_quiz');
+                    break;
+            }
             break;
     }
 
@@ -171,18 +188,22 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $expout .= "  <question type=\"$questiontype\">\n";
                 $expout .= "    <name>$nametext</name>\n";
                 $expout .= "    <questiontext format=\"$qtformat\">\n";
-                $expout .= writetext( $questiontext );
+                $expout .= writetext( '<p>'.$instructions.'</p><hr />' );
                 $expout .= "    </questiontext>\n";
                 $expout .= "    <shuffleanswers>" .$shuffleanswers . "</shuffleanswers>\n";
                 $questionscounter++;
             }
             $concept = trusttext_strip($entry->concept);
-            $definition = trusttext_strip($entry->definition);
-            $fs = get_file_storage();
-            $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+            $definition = strip_text(trusttext_strip($entry->definition));
             $expout .= "    <subquestion format=\"$qtformat\">\n";
-            $expout .= writetext($definition, 3);
-            $expout .= writefiles($entryfiles);
+            if ($subquestionscounter < $nbchoices - $extrawronganswer) {
+                $expout .= writetext($definition);
+                if ($exportmediafiles) {
+                    $fs = get_file_storage();
+                    $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+                    $expout .= write_files($entryfiles, false);
+                }
+            }
             $expout .= "      <answer>\n";
             $expout .= writetext($concept, 4);
             $expout .= "      </answer>\n";
@@ -209,10 +230,12 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     $expout .= writetext($dragboxconcept[$j], $nbchoices);
                     $expout .= "      </dragbox>\n";
                 }
+
                 $expout .= "</question>\n";
             }
-            if ($choicescounter == 0) { // Start new matching question.
+            if ($choicescounter == 0) { // Start a new ddwtos question.
                 $questiontext = '';
+                // Write the question name constructed from the text of the first concept plus etc.
                 $concept = trusttext_strip($entry->concept);
                 $nametext = writetext( $concept.' etc.' );
                 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
@@ -220,34 +243,107 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $expout .= "  <question type=\"$questiontype\">\n";
                 $expout .= "    <name>$nametext</name>\n";
                 $expout .= "    <questiontext format=\"$qtformat\">\n";
-                $questiontext .= '<p>'.$instructions.'</p>';
+                $questiontext .= '<p>'.$instructions.'</p><hr />';
                 $questionscounter++;
             }
             $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
-            $definition = trusttext_strip($entry->definition);
-            $questiontext .= '<p>[['. ($choicescounter + 1). ']]'. $definition.'</p>';
-            $fs = get_file_storage();
-            $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
-            $expout .= writefiles($entryfiles);
+            if ($choicescounter < $nbchoices - $extrawronganswer) {
+                $definition = strip_text(trusttext_strip($entry->definition));
+                $questiontext .= '<p>[['. ($choicescounter + 1). ']]'. $definition.'</p>';
+                if ($exportmediafiles) {
+                    $fs = get_file_storage();
+                    $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+                    $expout .= write_files($entryfiles, $short = false);
+                }
+            }
             $choicescounter++;
         }
         // Write the final question text and dragboxes!
         $expout .= writetext($questiontext, 3);
         $expout .= "    </questiontext>\n";
+        $expout .= "    <shuffleanswers>" .$shuffleanswers . "</shuffleanswers>\n";
         for ($j = 0; $j < $nbchoices; $j++) {
             $expout .= "      <dragbox>\n";
             $expout .= writetext($dragboxconcept[$j], $nbchoices);
             $expout .= "      </dragbox>\n";
         }
-        $expout .= "    <shuffleanswers>" .$shuffleanswers . "</shuffleanswers>\n";
+        $expout .= "</question>\n";
+    } else if ($questiontype == 'gapfill') {
+        $choicescounter = 0;
+        $questionscounter++;
+        $questiontext = '';
+        $dragboxconcept = array();
+
+        foreach ($entries as $entry) {
+            if ($choicescounter == $nbchoices) {
+                $choicescounter = 0;
+                // Write question text and dragboxes.
+                $expout .= writetext($questiontext, 3);
+                $expout .= "    </questiontext>\n";
+                $expout .= "    <answerdisplay>" .$answerdisplay . "</answerdisplay>\n";
+                $expout .= "    <delimitchars>[]</delimitchars>\n";
+                $expout .= "    <fixedgapsize>1</fixedgapsize>\n";
+                $expout .= "    <optionsaftertext>1</optionsaftertext>\n";
+
+                for ($j = 0; $j < $nbchoices; $j++) {
+                    $score = '"100"';
+                    if ($j == $nbchoices - $extrawronganswer) {
+                        $score = '"0"';
+                    }
+                    $expout .= "      <answer fraction=".$score.">\n";
+                    $expout .= writetext($dragboxconcept[$j], $nbchoices);
+                    $expout .= "      </answer>\n";
+                }
+
+                $expout .= "</question>\n";
+            }
+            if ($choicescounter == 0) { // Start a new question.
+                $questiontext = '';
+                // Write the question name constructed from the text of the first concept plus etc.
+                $concept = trusttext_strip($entry->concept);
+                $nametext = writetext( $concept.' etc.' );
+                $expout .= "\n\n<!-- question: $questionscounter  -->\n";
+                $qtformat = "html";
+                $expout .= "  <question type=\"$questiontype\">\n";
+                $expout .= "    <name>$nametext</name>\n";
+                $expout .= "    <questiontext format=\"$qtformat\">\n";
+                $questiontext .= '<p>'.$instructions.'</p><hr />';
+                $questionscounter++;
+            }
+            $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
+            if ($choicescounter < $nbchoices - $extrawronganswer) {
+                $definition = strip_text(trusttext_strip($entry->definition));
+                $questiontext .= '<p>['.$dragboxconcept[$choicescounter]. ']&nbsp;'. $definition.'</p>';
+                if ($exportmediafiles) {
+                    $fs = get_file_storage();
+                    $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+                    $expout .= write_files($entryfiles, $short = false);
+                }
+            }
+            $choicescounter++;
+        }
+        // Write the final question text and answers!
+        $expout .= writetext($questiontext, 3);
+        $expout .= "    </questiontext>\n";
+        $expout .= "    <answerdisplay>" .$answerdisplay . "</answerdisplay>\n";
+        $expout .= "    <delimitchars>[]</delimitchars>\n";
+        $expout .= "    <fixedgapsize>1</fixedgapsize>\n";
+        $expout .= "    <optionsaftertext>1</optionsaftertext>\n";
+        for ($j = 0; $j < $nbchoices; $j++) {
+            $score = '"100"';
+            if ($j == $nbchoices - $extrawronganswer) {
+                $score = '"0"';
+            }
+            $expout .= "      <answer fraction=".$score.">\n";
+            $expout .= writetext($dragboxconcept[$j], $nbchoices);
+            $expout .= "      </answer>\n";
+        }
         $expout .= "</question>\n";
 
     } else {
-        foreach ($entries as $entry) {
+        foreach ($entries as $entry) { // Question types multichoice and shortanswer.
             $questionscounter++;
-            $definition = trusttext_strip($entry->definition);
-            $fs = get_file_storage();
-            $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+            $definition = strip_text(trusttext_strip($entry->definition));
             $concept = trusttext_strip($entry->concept);
             $expout .= "\n\n<!-- question: $questionscounter  -->\n";
             $nametext = writetext( $concept );
@@ -255,8 +351,12 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $expout .= "  <question type=\"$questiontype\">\n";
             $expout .= "    <name>$nametext</name>\n";
             $expout .= "    <questiontext format=\"$qtformat\">\n";
-            $expout .= writetext( $definition );
-            $expout .= writefiles($entryfiles);
+            $expout .= writetext($definition, 0);
+            if ($exportmediafiles) {
+                $fs = get_file_storage();
+                $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+                $expout .= write_files($entryfiles);
+            }
             $expout .= "    </questiontext>\n";
 
             switch ($questiontype) {
@@ -313,23 +413,22 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                    "<quiz>\n" .
                    $expout . "\n" .
                    "</quiz>";
-
-// Make the xml look nice.
-$content = xmltidy( $content );
+?>
+<?php
 // Reset glossary export.
 $SESSION->block_glossary_export_to_quiz->status = '';
 
 send_file($content, $filename, 0, 0, true, true);
 
 /**
- * generates <text></text> tags, processing raw text therein
- * @param int ilev the current indent level
- * @param boolean short stick it on one line
- * @return string formatted text
+ * Generates <text></text> tags, processing raw text therein
+ * @param string $raw the content to output.
+ * @param int $indent the current indent level.
+ * @param bool $short stick it on one line.
+ * @return string formatted text.
  */
-function writetext($raw, $ilev = 0, $short = true) {
-    $indent = str_repeat('  ', $ilev);
-
+function writetext($raw, $indent = 0, $short = true) {
+    $indent = str_repeat('  ', $indent);
     // If required add CDATA tags.
     if (!empty($raw) and (htmlspecialchars($raw) != $raw)) {
         $raw = "<![CDATA[$raw]]>";
@@ -344,7 +443,13 @@ function writetext($raw, $ilev = 0, $short = true) {
     return $xml;
 }
 
-function writefiles($files, $encoding='base64') {
+/**
+ * Generate the XML to represent some files.
+ * @param array $files stored_file objects.
+ * @return string $string the XML.
+ */
+function write_files($files) {
+    global $mediafiles;
     if (empty($files)) {
         return '';
     }
@@ -353,22 +458,28 @@ function writefiles($files, $encoding='base64') {
         if ($file->is_directory()) {
             continue;
         }
-        $string .= '<file name="' . $file->get_filename() . '" encoding="' . $encoding . '">';
+        // Avoid potential duplicate files in XML.
+        if (in_array($file->get_filename() . $file->get_filepath(), $mediafiles)) {
+            return '';
+        } else {
+            $mediafiles[] = $file->get_filename() . $file->get_filepath();
+        }
+        $string .= '<file name="' . $file->get_filename() . '" path="' . $file->get_filepath() . '" encoding="base64">';
         $string .= base64_encode($file->get_content());
         $string .= '</file>';
     }
     return $string;
 }
 
-function xmltidy( $content ) {
-    // Can only do this if tidy is installed.
-    if (extension_loaded('tidy')) {
-        $config = array( 'input-xml' => true, 'output-xml' => true, 'indent' => true, 'wrap' => 0 );
-        $tidy = new tidy;
-        $tidy->parseString($content, $config, 'utf8');
-        $tidy->cleanRepair();
-        return $tidy->value;
-    } else {
-        return $content;
-    }
+/**
+ * Remove all links, paragraph, line break, horizontal line and div tags from string.
+ * @param string $text
+ * @return string cleaned text
+ */
+function strip_text ($text) {
+    $pattern = '/(<p[^>]*>|<\/p>|<div[^>]*>|<\/div>|<[bh]r ?\/?>|<a.*<\/a>)/';
+    $text = preg_replace ($pattern, '', $text);
+    $pattern = '/\n/';
+    $text = preg_replace ($pattern, ' ', $text);
+    return $text;
 }

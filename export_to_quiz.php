@@ -37,8 +37,11 @@ $nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
 $usecase = optional_param('usecase', '', PARAM_ALPHANUM);
 $answernumbering = optional_param('answernumbering', '', PARAM_ALPHANUM);
 $shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
+$answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
 $numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
+$exportmediafiles = optional_param('exportmediafiles', '', PARAM_ALPHANUM);
+$extrawronganswer = optional_param('extrawronganswer', '', PARAM_ALPHANUM);
 $url = new moodle_url('/mod/glossary/export.php', array('id' => $id));
 if ($cat !== 0) {
     $url->param('cat', $cat);
@@ -63,7 +66,7 @@ require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/glossary:export', $context);
 
-$strglossary = get_string("modulename", "glossary");
+
 $strexportfile = get_string("exportfile", "glossary");
 $strexportentries = get_string('exportentriestoxml', 'block_glossary_export_to_quiz');
 
@@ -90,7 +93,10 @@ echo ('
     <input type="hidden" name="usecase" value='.$usecase.' />
     <input type="hidden" name="answernumbering" value='.$answernumbering.' />
     <input type="hidden" name="shuffleanswers" value='.$shuffleanswers.' />
+    <input type="hidden" name="answerdisplay" value='.$answerdisplay.' />
     <input type="hidden" name="numquestions" value='.$numquestions.' />
+    <input type="hidden" name="exportmediafiles" value='.$exportmediafiles.' />
+    <input type="hidden" name="extrawronganswer" value='.$extrawronganswer.' />
     </div>
     </form>
 ');

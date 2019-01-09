@@ -18,18 +18,31 @@
  * Version details
  *
  * @package    block_glossary_export_to_quiz
- * @copyright  Joseph Rézeau moodle@rezeau.org
+ * @copyright  Joseph Rézeau <moodle@rezeau.org>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Form for editing glossary_export_to_quiz block instances.
+ *
+ * @copyright  Joseph Rézeau <moodle@rezeau.org>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_glossary_export_to_quiz_edit_form extends block_edit_form {
 
+    /**
+     * The definition of the fields to use.
+     *
+     * @param MoodleQuickForm $mform
+     */
     protected function specific_definition($mform) {
-        global $DB, $SESSION;
+        global $CFG, $DB, $SESSION;
         $SESSION->block_glossary_export_to_quiz = new stdClass();
         $SESSION->block_glossary_export_to_quiz->status = 'defined';
+        // Needed for getting available question types.
+        require_once($CFG->libdir . '/questionlib.php');
 
         // Fields for editing HTML block title and contents.
         $mform->addElement('static', 'generalhelp', get_string('pluginname', 'block_glossary_export_to_quiz') .
@@ -66,10 +79,18 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     if (!empty ($categories)) {
                         foreach ($categories as $category) {
                             $cid = $category->id;
-                            $numentries = $DB->count_records('glossary_entries_categories', array('categoryid' => $category->id));
-                            $categoriesarray[$glossarystring][$key.','.$cid] = $glossarystring.' :: '.
-                                $category->name.' ('.$numentries.')';
-                            $numentriesincategory[$key][$cid] = $numentries;
+                            $sql = "SELECT COUNT(*) "
+                                ." FROM mdl_glossary_entries ge , mdl_glossary_entries_categories c "
+                                . " WHERE ge.glossaryid = $key "
+                                . " AND ge.approved = 1 AND ge.id = c.entryid "
+                                . " AND c.categoryid = $cid";
+                            $numentries = $DB->count_records_sql($sql);
+                            // Do not show empty categories in the list!
+                            if ($numentries) {
+                                $categoriesarray[$glossarystring][$key.','.$cid] = $glossarystring.' :: '.
+                                    $category->name.' ('.$numentries.')';
+                                $numentriesincategory[$key][$cid] = $numentries;
+                            }
                         }
                     }
                 }
@@ -89,10 +110,11 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
 
                 $group = array($mform->createElement('selectgroups', 'config_glossary', '', $categoriesarray) );
                 $mform->addGroup($group, 'selectglossary',
-                                get_string('selectglossary', 'block_glossary_export_to_quiz'), '', false);
+                    get_string('selectglossary', 'block_glossary_export_to_quiz'), '', false);
 
                 // And select sortorder types to put in dropdown box.
                 $mform->addHelpButton('selectglossary', 'selectglossary', 'block_glossary_export_to_quiz');
+
                 $types = array(
                     0 => get_string('concept', 'block_glossary_export_to_quiz'),
                     1 => get_string('lastmodified', 'block_glossary_export_to_quiz'),
@@ -112,7 +134,6 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->hideIf('config_limitnum', 'config_glossary', 'eq', 0);
 
                 // And select question types to put in dropdown box.
-
                 $strquestiontypes = array(
                     0 => get_string('choosedots'),
                     1 => get_string('pluginname', 'qtype_shortanswer'),
@@ -120,6 +141,15 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     3 => get_string('pluginname', 'qtype_match'),
                     4 => get_string('pluginname', 'qtype_ddwtos')
                 );
+
+                // JR DECEMBER 2018 todo maybe add more question types.
+                $gapfillinstalled = false;
+                $createabletypes = question_bank::get_creatable_qtypes();
+                if (array_key_exists('gapfill', $createabletypes)) {
+                    $gapfillinstalled = true;
+                    $strquestiontypes[5] = get_string('pluginname', 'qtype_gapfill');
+                };
+
                 $mform->addElement('select', 'config_questiontype',
                     get_string('selectquestiontype', 'quiz'), $strquestiontypes);
                 $mform->setDefault('config_questiontype', 0);
@@ -135,12 +165,48 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     9 => 9,
                     10 => 10
                 );
+                if ($gapfillinstalled) {
+                    $answerdisplaytypes = array(
+                        "gapfill" => get_string('displaygapfill', 'qtype_gapfill'),
+                        "dragdrop" => get_string('displaydragdrop', 'qtype_gapfill'),
+                        "dropdown" => get_string('displaydropdown', 'qtype_gapfill'));
+
+                    $mform->addElement('select', 'config_answerdisplay', get_string('pluginname', 'qtype_gapfill').' '
+                        .get_string('answerdisplay', 'qtype_gapfill'), $answerdisplaytypes);
+                    $mform->setDefault('config_answerdisplay', 1);
+                    $mform->addHelpButton('config_answerdisplay', 'answerdisplay', 'qtype_gapfill');
+                    $mform->hideIf('config_answerdisplay', 'config_questiontype', 'neq', 5);
+                    $mform->hideIf('config_answerdisplay', 'config_glossary', 'eq', 0);
+
+                    // Sets all gaps to the size of the largest gap, avoids giving clues to the correct answer.
+                    $mform->addElement('advcheckbox', 'config_fixedgapsize', get_string('fixedgapsize', 'qtype_gapfill'));
+                    $mform->addHelpButton('config_fixedgapsize', 'fixedgapsize', 'qtype_gapfill');
+                    $mform->hideIf('config_fixedgapsize', 'config_answerdisplay', 'eq', 'dropdown');
+                    $mform->hideIf('config_fixedgapsize', 'config_questiontype', 'neq', 5);
+                    $mform->hideIf('config_fixedgapsize', 'config_glossary', 'eq', 0);
+                }
+
                 $mform->addElement('select', 'config_nbchoices',
                     get_string('nbchoices', 'block_glossary_export_to_quiz'), $nbchoices);
                 $mform->addHelpButton('config_nbchoices', 'nbchoices', 'block_glossary_export_to_quiz');
                 // Disable my control unless a dropdown has value 42.
                 $mform->hideIf('config_nbchoices', 'config_questiontype', 'eq', 0);
                 $mform->hideIf('config_nbchoices', 'config_questiontype', 'eq', 1);
+                $mform->hideIf('config_nbchoices', 'config_glossary', 'eq', 0);
+
+                // Matching & drag&drop text add an extra wrong answer.
+                $menu = array(
+                    get_string('no'),
+                    get_string('yes')
+                );
+                $mform->addElement('select', 'config_extrawronganswer',
+                    get_string('extrawronganswer', 'block_glossary_export_to_quiz'), $menu);
+                $mform->addHelpButton('config_extrawronganswer', 'extrawronganswer', 'block_glossary_export_to_quiz');
+                // Disable this control for shortanswer (0) and multichoice (2) question types.
+                $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 0);
+                $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 2);
+                $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 1);
+                $mform->hideIf('config_extrawronganswer', 'config_glossary', 'eq', 0);
 
                 // Answer numbering for multichoice questions.
                 $answernumbering = array(
@@ -154,6 +220,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->addElement('select', 'config_answernumbering',
                     get_string('answernumbering', 'qtype_multichoice'), $answernumbering);
                 $mform->hideIf('config_answernumbering', 'config_questiontype', 'neq', 2);
+                $mform->hideIf('config_answernumbering', 'config_glossary', 'eq', 0);
 
                 // Shuffle within questions.
                 $mform->addElement('selectyesno', 'config_shuffleanswers',
@@ -162,6 +229,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->setDefault('config_shuffleanswers', 1);
                 $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 0);
                 $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 1);
+                $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 5);
 
                 // Short answer usecase.
                 $menu = array(
@@ -172,11 +240,30 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     get_string('casesensitive', 'qtype_shortanswer'), $menu);
                 $mform->hideIf('config_usecase', 'config_questiontype', 'neq', 1);
                 $mform->hideIf('config_usecase', 'config_glossary', 'eq', 0);
+
+                // Export media files.
+                $menu = array(
+                    get_string('no'),
+                    get_string('yes')
+                );
+                $mform->addElement('select', 'config_exportmediafiles',
+                    get_string('exportmediafiles', 'block_glossary_export_to_quiz'), $menu);
+                $mform->addHelpButton('config_exportmediafiles', 'exportmediafiles', 'block_glossary_export_to_quiz');
+                $mform->hideIf('config_exportmediafiles', 'config_glossary', 'eq', 0);
+                $mform->hideIf('config_exportmediafiles', 'config_questiontype', 'eq', 0);
             }
         }
     }
 
+    /**
+     * Validate the submitted form data.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array $errors
+     */
     public function validation($data, $files) {
+        $errors = array();
         if (!isset($data['config_glossary'])) {
             return;
         }
@@ -196,8 +283,9 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
             $maxentries = $glossarynumentries;
         }
         if ($questiontype > 1) {
+            $data['config_nbchoices'] += $data['config_extrawronganswer'];
             $nbchoices = $data['config_nbchoices'];
-            if ($questiontype > 1) { // Multichoice.
+            if ($questiontype > 1) { // Multichoice / matching / draganddrop.
                 if ($maxentries < $nbchoices || $glossarynumentries < $nbchoices) {
                     if ($maxentries < $nbchoices ) {
                         $errormsg = 'notenoughentriesselected';
