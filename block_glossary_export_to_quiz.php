@@ -15,8 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Block glossary_export_to_quiz definition.
  *
+ * This block can be added to a course page to enable a teacher to export
+ * glossary entries to various question types.
+ 
  * @package    block_glossary_export_to_quiz
  * @copyright  Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,16 +27,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * Block glossary_export_to_quiz definition.
- *
- * This block can be added to a course page to enable a teacher to export
- * glossary entries to various question types.
- *
- * @package    block_glossary_export_to_quiz
- * @copyright  Joseph Rézeau <moodle@rezeau.org>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class block_glossary_export_to_quiz extends block_base {
 
     /**
