@@ -68,3 +68,5 @@ Some question types are not really compatible with some media elements.';
 $string['extrawronganswer'] = 'Add one extra wrong answer?';
 $string['extrawronganswer_help'] = 'Do you want to add an extra wrong answer/distracter to each of your questions?';
 $string['gapfillddinstructions'] = 'Select from each dropdown list the concept which matches its definition';
+$string['maskconceptindefinitions'] = 'Mask concept words in definition texts?';
+$string['maskconceptindefinitions_help'] = 'If concept words appear in the text of their definitions, do you want to mask them (with 3 asterisks)?';
