@@ -41,6 +41,7 @@ $answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
 $numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
 $exportmediafiles = optional_param('exportmediafiles', '', PARAM_ALPHANUM);
+$maskconceptindefinitions = optional_param('maskconceptindefinitions', '', PARAM_ALPHANUM);
 $extrawronganswer = optional_param('extrawronganswer', '', PARAM_ALPHANUM);
 $url = new moodle_url('/mod/glossary/export.php', array('id' => $id));
 if ($cat !== 0) {
@@ -96,6 +97,7 @@ echo ('
     <input type="hidden" name="answerdisplay" value='.$answerdisplay.' />
     <input type="hidden" name="numquestions" value='.$numquestions.' />
     <input type="hidden" name="exportmediafiles" value='.$exportmediafiles.' />
+    <input type="hidden" name="maskconceptindefinitions" value='.$maskconceptindefinitions.' />
     <input type="hidden" name="extrawronganswer" value='.$extrawronganswer.' />
     </div>
     </form>

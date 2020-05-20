@@ -153,6 +153,7 @@ class block_glossary_export_to_quiz extends block_base {
         $exportmediafiles = $this->config->exportmediafiles;
         $answerdisplay = '';
         $extrawronganswer = $this->config->extrawronganswer;
+        $maskconceptindefinitions = $this->config->maskconceptindefinitions;
         $shuffleanswers = '';
         $answernumbering = '';
         $nbchoices = '';
@@ -250,6 +251,7 @@ class block_glossary_export_to_quiz extends block_base {
             .$CFG->wwwroot.'/blocks/glossary_export_to_quiz/export_to_quiz.php?id='
             .$cmid.'&amp;cat='.$categoryid.'&amp;limitnum='.$limitnum.'&amp;questiontype='.$questiontype
             .'&amp;sortorder='.$sortorder.'&amp;usecase='.$usecase.'&amp;exportmediafiles='.$exportmediafiles
+            .'&amp;maskconceptindefinitions='.$maskconceptindefinitions
             .'&amp;nbchoices='.$nbchoices.'&amp;extrawronganswer='.$extrawronganswer
             .'&amp;numquestions='.$numquestions.'&amp;answernumbering='.$answernumbering
             .'&amp;shuffleanswers='.$shuffleanswers.'&amp;answerdisplay='.$answerdisplay.'>'

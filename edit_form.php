@@ -195,14 +195,11 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->hideIf('config_nbchoices', 'config_glossary', 'eq', 0);
 
                 // Matching & drag&drop text add an extra wrong answer.
-                $menu = array(
-                    get_string('no'),
-                    get_string('yes')
-                );
-                $mform->addElement('select', 'config_extrawronganswer',
-                    get_string('extrawronganswer', 'block_glossary_export_to_quiz'), $menu);
+                $mform->addElement('selectyesno', 'config_extrawronganswer',
+                    get_string('extrawronganswer', 'block_glossary_export_to_quiz'));
                 $mform->addHelpButton('config_extrawronganswer', 'extrawronganswer', 'block_glossary_export_to_quiz');
                 // Disable this control for shortanswer (0) and multichoice (2) question types.
+                $mform->setDefault('config_extrawronganswer', 0);
                 $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 0);
                 $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 2);
                 $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 1);
@@ -232,12 +229,8 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 5);
 
                 // Short answer usecase.
-                $menu = array(
-                    get_string('caseno', 'qtype_shortanswer'),
-                    get_string('caseyes', 'qtype_shortanswer')
-                );
-                $mform->addElement('select', 'config_usecase',
-                    get_string('casesensitive', 'qtype_shortanswer'), $menu);
+                $mform->addElement('selectyesno', 'config_usecase',
+                    get_string('casesensitive', 'qtype_shortanswer'));
                 $mform->hideIf('config_usecase', 'config_questiontype', 'neq', 1);
                 $mform->hideIf('config_usecase', 'config_glossary', 'eq', 0);
 
@@ -251,6 +244,12 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->addHelpButton('config_exportmediafiles', 'exportmediafiles', 'block_glossary_export_to_quiz');
                 $mform->hideIf('config_exportmediafiles', 'config_glossary', 'eq', 0);
                 $mform->hideIf('config_exportmediafiles', 'config_questiontype', 'eq', 0);
+                
+                $mform->addElement('selectyesno', 'config_maskconceptindefinitions',
+                    get_string('maskconceptindefinitions', 'block_glossary_export_to_quiz'));
+                $mform->addHelpButton('config_maskconceptindefinitions', 'maskconceptindefinitions', 'block_glossary_export_to_quiz');
+                $mform->setDefault('config_maskconceptindefinitions', 1);
+                $mform->hideIf('config_maskconceptindefinitions', 'config_glossary', 'eq', 0);
             }
         }
     }

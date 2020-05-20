@@ -27,6 +27,7 @@
 
 require_once("../../config.php");
 require_once("../../lib/filelib.php");
+
 global $SESSION, $DB, $mediafiles;
 $SESSION->block_glossary_export_to_quiz->status = '';
 $mediafiles = array();
@@ -45,6 +46,7 @@ $entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
 $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
 $exportmediafiles = optional_param('exportmediafiles', '', PARAM_ALPHANUM);
 $extrawronganswer = optional_param('extrawronganswer', '', PARAM_ALPHANUM);
+$maskconceptindefinitions = optional_param('maskconceptindefinitions', '', PARAM_ALPHANUM);
 
 if (! $cm = get_coursemodule_from_id('glossary', $id)) {
     error("Course Module ID was incorrect");
@@ -194,7 +196,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $questionscounter++;
             }
             $concept = trusttext_strip($entry->concept);
-            $definition = strip_text(trusttext_strip($entry->definition));
+            $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
             $expout .= "    <subquestion format=\"$qtformat\">\n";
             if ($subquestionscounter < $nbchoices - $extrawronganswer) {
                 $expout .= writetext($definition);
@@ -248,7 +250,8 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             }
             $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
             if ($choicescounter < $nbchoices - $extrawronganswer) {
-                $definition = strip_text(trusttext_strip($entry->definition));
+                $concept = trusttext_strip($entry->concept);
+                $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
                 $questiontext .= '<p>[['. ($choicescounter + 1). ']]'. $definition.'</p>';
                 if ($exportmediafiles) {
                     $fs = get_file_storage();
@@ -312,7 +315,8 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             }
             $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
             if ($choicescounter < $nbchoices - $extrawronganswer) {
-                $definition = strip_text(trusttext_strip($entry->definition));
+                $concept = trusttext_strip($entry->concept);
+                $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
                 $questiontext .= '<p>['.$dragboxconcept[$choicescounter]. ']&nbsp;'. $definition.'</p>';
                 if ($exportmediafiles) {
                     $fs = get_file_storage();
@@ -342,9 +346,9 @@ if ( $entries = $DB->get_records_sql($sql) ) {
 
     } else {
         foreach ($entries as $entry) { // Question types multichoice and shortanswer.
-            $questionscounter++;
-            $definition = strip_text(trusttext_strip($entry->definition));
+            $questionscounter++;            
             $concept = trusttext_strip($entry->concept);
+            $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
             $expout .= "\n\n<!-- question: $questionscounter  -->\n";
             $nametext = writetext( $concept );
             $qtformat = "html";
@@ -472,14 +476,37 @@ function write_files($files) {
 }
 
 /**
- * Remove all links, paragraph, line break, horizontal line and div tags from string.
+ * Remove all links, paragraph, line break, horizontal line and div tags from string
+ * except paragraphs containing an image 19 APRIL 2020.
  * @param string $text
  * @return string cleaned text
  */
-function strip_text ($text) {
-    $pattern = '/(<p[^>]*>|<\/p>|<div[^>]*>|<\/div>|<[bh]r ?\/?>|<a.*<\/a>)/';
-    $text = preg_replace ($pattern, '', $text);
-    $pattern = '/\n/';
-    $text = preg_replace ($pattern, ' ', $text);
-    return $text;
+function strip_text ($text, $concept, $maskconceptindefinitions, $exportmediafiles) {
+  $pattern = '/(<p[^>]*>|<\/p>|<div[^>]*>|<\/div>|<[bh]r ?\/?>|<a.*<\/a>)/';
+  $text = preg_replace ($pattern, ' ', $text);
+      
+  // Find images in text (if any);
+  // Enclose images in paragraph tags
+  $pattern = '/(<img.*?>)/';
+  $replacement = '<p>$1</p>';
+  $text = preg_replace($pattern, $replacement, $text);
+  
+  $pattern = '/\n/';
+  $text = preg_replace ($pattern, ' ', $text);
+
+  if (!$exportmediafiles) {
+    $pattern = '/<img.*?>/';
+    $replacement = '';
+    $text = preg_replace($pattern, $replacement, $text);
+  }    
+  
+  // If replace concept string in definition with asterisks ***.
+  // Do NOT replace within image link !!!
+  if ($maskconceptindefinitions) {
+    $pattern = '/'.$concept.'(?!(\p{P}))/i';
+    $replacement = '***';
+    $text = preg_replace ($pattern, $replacement, $text);
+  }
+
+  return $text;
 }
