@@ -1,5 +1,8 @@
 Release notes
 --------------------------------
+Version 3.9.0 release 2020080100 for Moodle 3.9
+- added function to remove concept words from definition text 
+
 Version 3.6.0 release 2018120900 for Moodle 3.6
 - Added export to Gapfill add-on question type (if installed) with 3 options:
     gapfill, dragdrop, dropdown and fixed gap size
