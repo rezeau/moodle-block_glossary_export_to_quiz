@@ -1,5 +1,8 @@
 Release notes
 --------------------------------
+Version 4.0 release 2022041600 for Moodle 3.9 to 4.0
+- Identical to previous version 3.9.0
+
 Version 3.9.0 release 2020080100 for Moodle 3.9
 - added function to remove concept words from definition text 
 
