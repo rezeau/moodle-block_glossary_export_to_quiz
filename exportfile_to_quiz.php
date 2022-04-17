@@ -251,7 +251,8 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
             if ($choicescounter < $nbchoices - $extrawronganswer) {
                 $concept = trusttext_strip($entry->concept);
-                $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
+                $definition = strip_text(trusttext_strip($entry->definition),
+                    $concept, $maskconceptindefinitions, $exportmediafiles);
                 $questiontext .= '<p>[['. ($choicescounter + 1). ']]'. $definition.'</p>';
                 if ($exportmediafiles) {
                     $fs = get_file_storage();
@@ -316,7 +317,8 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
             if ($choicescounter < $nbchoices - $extrawronganswer) {
                 $concept = trusttext_strip($entry->concept);
-                $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
+                $definition = strip_text(trusttext_strip($entry->definition),
+                    $concept, $maskconceptindefinitions, $exportmediafiles);
                 $questiontext .= '<p>['.$dragboxconcept[$choicescounter]. ']&nbsp;'. $definition.'</p>';
                 if ($exportmediafiles) {
                     $fs = get_file_storage();
@@ -346,7 +348,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
 
     } else {
         foreach ($entries as $entry) { // Question types multichoice and shortanswer.
-            $questionscounter++;            
+            $questionscounter++;
             $concept = trusttext_strip($entry->concept);
             $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
             $expout .= "\n\n<!-- question: $questionscounter  -->\n";
@@ -479,34 +481,37 @@ function write_files($files) {
  * Remove all links, paragraph, line break, horizontal line and div tags from string
  * except paragraphs containing an image 19 APRIL 2020.
  * @param string $text
+ * @param string $concept
+ * @param string $maskconceptindefinitions
+ * @param string $exportmediafiles
  * @return string cleaned text
  */
 function strip_text ($text, $concept, $maskconceptindefinitions, $exportmediafiles) {
-  $pattern = '/(<p[^>]*>|<\/p>|<div[^>]*>|<\/div>|<[bh]r ?\/?>|<a.*<\/a>)/';
-  $text = preg_replace ($pattern, ' ', $text);
-      
-  // Find images in text (if any);
-  // Enclose images in paragraph tags
-  $pattern = '/(<img.*?>)/';
-  $replacement = '<p>$1</p>';
-  $text = preg_replace($pattern, $replacement, $text);
-  
-  $pattern = '/\n/';
-  $text = preg_replace ($pattern, ' ', $text);
+    $pattern = '/(<p[^>]*>|<\/p>|<div[^>]*>|<\/div>|<[bh]r ?\/?>|<a.*<\/a>)/';
+    $text = preg_replace ($pattern, ' ', $text);
 
-  if (!$exportmediafiles) {
-    $pattern = '/<img.*?>/';
-    $replacement = '';
+    // Find images in text (if any).
+    // Enclose images in paragraph tags.
+    $pattern = '/(<img.*?>)/';
+    $replacement = '<p>$1</p>';
     $text = preg_replace($pattern, $replacement, $text);
-  }    
-  
-  // If replace concept string in definition with asterisks ***.
-  // Do NOT replace within image link !!!
-  if ($maskconceptindefinitions) {
-    $pattern = '/'.$concept.'(?!(\p{P}))/i';
-    $replacement = '***';
-    $text = preg_replace ($pattern, $replacement, $text);
-  }
 
-  return $text;
+    $pattern = '/\n/';
+    $text = preg_replace ($pattern, ' ', $text);
+
+    if (!$exportmediafiles) {
+        $pattern = '/<img.*?>/';
+        $replacement = '';
+        $text = preg_replace($pattern, $replacement, $text);
+    }
+
+    // If replace concept string in definition with asterisks ***.
+    // Do NOT replace within image link !!!
+    if ($maskconceptindefinitions) {
+        $pattern = '/'.$concept.'(?!(\p{P}))/i';
+        $replacement = '***';
+        $text = preg_replace ($pattern, $replacement, $text);
+    }
+
+    return $text;
 }

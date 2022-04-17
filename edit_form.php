@@ -241,13 +241,14 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 );
                 $mform->addElement('select', 'config_exportmediafiles',
                     get_string('exportmediafiles', 'block_glossary_export_to_quiz'), $menu);
-                $mform->addHelpButton('config_exportmediafiles', 'exportmediafiles', 'block_glossary_export_to_quiz');
+                $mform->addHelpButton('config_exportmediafiles', 'exportmediafiles',
+                    'block_glossary_export_to_quiz');
                 $mform->hideIf('config_exportmediafiles', 'config_glossary', 'eq', 0);
                 $mform->hideIf('config_exportmediafiles', 'config_questiontype', 'eq', 0);
-                
                 $mform->addElement('selectyesno', 'config_maskconceptindefinitions',
-                    get_string('maskconceptindefinitions', 'block_glossary_export_to_quiz'));
-                $mform->addHelpButton('config_maskconceptindefinitions', 'maskconceptindefinitions', 'block_glossary_export_to_quiz');
+                get_string('maskconceptindefinitions', 'block_glossary_export_to_quiz'));
+                $mform->addHelpButton('config_maskconceptindefinitions', 'maskconceptindefinitions',
+                    'block_glossary_export_to_quiz');
                 $mform->setDefault('config_maskconceptindefinitions', 1);
                 $mform->hideIf('config_maskconceptindefinitions', 'config_glossary', 'eq', 0);
             }

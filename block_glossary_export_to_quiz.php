@@ -19,7 +19,7 @@
  *
  * This block can be added to a course page to enable a teacher to export
  * glossary entries to various question types.
- 
+
  * @package    block_glossary_export_to_quiz
  * @copyright  Joseph Rézeau moodle@rezeau.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,6 +27,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Block glossary_export_to_quiz definition.
+ *
+ * This block can be added to a course page to enable a teacher to export
+ * glossary entries to various question types.
+ */
 class block_glossary_export_to_quiz extends block_base {
 
     /**
@@ -51,7 +57,7 @@ class block_glossary_export_to_quiz extends block_base {
      * For instance: if your block will have different title's depending on location (site, course, blog, etc)
      */
     public function specialization() {
-        global $CFG, $DB, $OUTPUT, $PAGE;
+        global $CFG, $DB, $OUTPUT;
         require_once($CFG->libdir . '/filelib.php');
         // Needed for getting available question types.
         require_once($CFG->libdir . '/questionlib.php');
@@ -82,8 +88,8 @@ class block_glossary_export_to_quiz extends block_base {
      * @return stdObject
      */
     public function get_content() {
-        global $USER, $CFG, $DB, $PAGE, $SESSION;
-        $editing = $PAGE->user_is_editing();
+        global $USER, $CFG, $DB, $SESSION;
+        $editing = $this->page->user_is_editing();
         $this->content = new stdClass();
         // Set view block permission to course:mod/glossary:export to prevent students etc to view this block.
         $course = $this->page->course;
