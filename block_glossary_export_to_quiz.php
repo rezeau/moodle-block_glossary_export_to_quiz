@@ -35,7 +35,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class block_glossary_export_to_quiz extends block_base {
 
+	/** @var stdClass course data. */
+    public $course;
     /**
+
      * Core function used to initialize the block.
      */
     public function init() {
@@ -61,14 +64,13 @@ class block_glossary_export_to_quiz extends block_base {
         require_once($CFG->libdir . '/filelib.php');
         // Needed for getting available question types.
         require_once($CFG->libdir . '/questionlib.php');
+		$this->course = $this->page->course;
         // Load userdefined title and make sure it's never empty.
         if (empty($this->config->title)) {
             $this->title = get_string('pluginname', 'block_glossary_export_to_quiz');
         } else {
             $this->title = $this->config->title;
         }
-        $course = $this->page->course;
-        $this->course = $course;
     }
     /**
      * Allows the block to be added multiple times to a single page
