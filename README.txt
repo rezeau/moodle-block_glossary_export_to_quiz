@@ -1,5 +1,10 @@
 Release notes
 --------------------------------
+Version 4.0 release 2024042700 for Moodle 4.4+
+- fixed PHP warnings ok
+- removed deprecated trusttext_strip() function
+- fixed $maskconceptindefinitions (full word only)
+
 Version 4.0 release 2022041600 for Moodle 3.9 to 4.0
 - Identical to previous version 3.9.0
 

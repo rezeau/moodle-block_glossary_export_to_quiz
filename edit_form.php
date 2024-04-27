@@ -31,7 +31,9 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_glossary_export_to_quiz_edit_form extends block_edit_form {
-
+    // Declare Properties Explicitly to avoid PHP warning "Deprecated: Creation of dynamic property is deprecated"
+    public $categoriesarray = [];
+    public $numentriesincategory = [];
     /**
      * The definition of the fields to use.
      *

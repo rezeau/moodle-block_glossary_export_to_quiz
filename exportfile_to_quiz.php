@@ -183,7 +183,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $expout .= "</question>\n";
             }
             if ($subquestionscounter === 0) { // Start new matching question.
-                $concept = trusttext_strip($entry->concept);
+                $concept = $entry->concept;
                 $nametext = writetext( $concept.' etc.' );
                 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
                 $qtformat = "html";
@@ -195,8 +195,8 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $expout .= "    <shuffleanswers>" .$shuffleanswers . "</shuffleanswers>\n";
                 $questionscounter++;
             }
-            $concept = trusttext_strip($entry->concept);
-            $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
+            $concept = $entry->concept;
+            $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
             $expout .= "    <subquestion format=\"$qtformat\">\n";
             if ($subquestionscounter < $nbchoices - $extrawronganswer) {
                 $expout .= writetext($definition);
@@ -238,7 +238,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             if ($choicescounter == 0) { // Start a new ddwtos question.
                 $questiontext = '';
                 // Write the question name constructed from the text of the first concept plus etc.
-                $concept = trusttext_strip($entry->concept);
+                $concept = $entry->concept;
                 $nametext = writetext( $concept.' etc.' );
                 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
                 $qtformat = "html";
@@ -248,10 +248,10 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $questiontext .= '<p>'.$instructions.'</p><hr />';
                 $questionscounter++;
             }
-            $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
+            $dragboxconcept[$choicescounter] = $entry->concept;
             if ($choicescounter < $nbchoices - $extrawronganswer) {
-                $concept = trusttext_strip($entry->concept);
-                $definition = strip_text(trusttext_strip($entry->definition),
+                $concept = $entry->concept;
+                $definition = strip_text($entry->definition,
                     $concept, $maskconceptindefinitions, $exportmediafiles);
                 $questiontext .= '<p>[['. ($choicescounter + 1). ']]'. $definition.'</p>';
                 if ($exportmediafiles) {
@@ -304,7 +304,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             if ($choicescounter == 0) { // Start a new question.
                 $questiontext = '';
                 // Write the question name constructed from the text of the first concept plus etc.
-                $concept = trusttext_strip($entry->concept);
+                $concept = $entry->concept;
                 $nametext = writetext( $concept.' etc.' );
                 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
                 $qtformat = "html";
@@ -314,10 +314,10 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 $questiontext .= '<p>'.$instructions.'</p><hr />';
                 $questionscounter++;
             }
-            $dragboxconcept[$choicescounter] = trusttext_strip($entry->concept);
+            $dragboxconcept[$choicescounter] = $entry->concept;
             if ($choicescounter < $nbchoices - $extrawronganswer) {
-                $concept = trusttext_strip($entry->concept);
-                $definition = strip_text(trusttext_strip($entry->definition),
+                $concept = $entry->concept;
+                $definition = strip_text($entry->definition,
                     $concept, $maskconceptindefinitions, $exportmediafiles);
                 $questiontext .= '<p>['.$dragboxconcept[$choicescounter]. ']&nbsp;'. $definition.'</p>';
                 if ($exportmediafiles) {
@@ -349,8 +349,8 @@ if ( $entries = $DB->get_records_sql($sql) ) {
     } else {
         foreach ($entries as $entry) { // Question types multichoice and shortanswer.
             $questionscounter++;
-            $concept = trusttext_strip($entry->concept);
-            $definition = strip_text(trusttext_strip($entry->definition), $concept, $maskconceptindefinitions, $exportmediafiles);
+            $concept = $entry->concept;
+            $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
             $expout .= "\n\n<!-- question: $questionscounter  -->\n";
             $nametext = writetext( $concept );
             $qtformat = "html";
@@ -507,10 +507,11 @@ function strip_text ($text, $concept, $maskconceptindefinitions, $exportmediafil
 
     // If replace concept string in definition with asterisks ***.
     // Do NOT replace within image link !!!
+    // Only replace if full word, not part of word. 27/04/2024.
     if ($maskconceptindefinitions) {
-        $pattern = '/'.$concept.'(?!(\p{P}))/i';
+        $pattern = '/\b' . preg_quote($concept, '/') . '\b(?![[:punct:]])|(?<![[:punct:]])\b' . preg_quote($concept, '/') . '\b/i';
         $replacement = '***';
-        $text = preg_replace ($pattern, $replacement, $text);
+        $text = preg_replace($pattern, $replacement, $text);
     }
 
     return $text;

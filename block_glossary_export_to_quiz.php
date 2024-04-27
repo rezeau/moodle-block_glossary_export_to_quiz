@@ -191,7 +191,9 @@ class block_glossary_export_to_quiz extends block_base {
             case 5:     // Type gapfill.
                 $nbchoices = $this->config->nbchoices;
                 $shuffleanswers = $this->config->shuffleanswers;
-                $answerdisplay = $this->config->answerdisplay;
+                if (isset($this->config->answerdisplay)) {
+                    $answerdisplay = $this->config->answerdisplay;
+                }
             break;
         }
 
