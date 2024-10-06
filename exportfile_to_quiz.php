@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// File mod/glossary/exportfile.php modified by Joseph Rézeau NOVEMBER 2010
+// File mod/glossary/exportfile.php modified by Joseph Rézeau
 // for exporting glossaries to XML for importing to question bank.
 
 require_once("../../config.php");
@@ -30,7 +30,7 @@ require_once("../../lib/filelib.php");
 
 global $SESSION, $DB, $mediafiles;
 $SESSION->block_glossary_export_to_quiz->status = '';
-$mediafiles = array();
+$mediafiles = [];
 
 $id = required_param('id', PARAM_INT);      // Course Module ID.
 $cat = optional_param('cat', 0, PARAM_ALPHANUM);
@@ -52,11 +52,11 @@ if (! $cm = get_coursemodule_from_id('glossary', $id)) {
     error("Course Module ID was incorrect");
 }
 
-if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
+if (! $course = $DB->get_record("course", ['id' => $cm->course])) {
     error("Course is misconfigured");
 }
 
-if (! $glossary = $DB->get_record("glossary", array('id' => $cm->instance))) {
+if (! $glossary = $DB->get_record("glossary", ['id' => $cm->instance])) {
     error("Course module is incorrect");
 }
 
@@ -96,7 +96,7 @@ $catfrom = "";
 $catwhere = "";
 $giftcategoryname = $glossary->name;
 if ($cat) {
-    $category = $DB->get_record('glossary_categories', array('id' => $cat));
+    $category = $DB->get_record('glossary_categories', ['id' => $cat]);
     $categoryname = $category->name;
     $giftcategoryname .= '_'.$categoryname;
     $catfrom = ", mdl_glossary_entries_categories c ";
@@ -152,7 +152,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
     $instructions = '';
     switch ($questiontype) {
         case 'multichoice':
-            $concepts = array();
+            $concepts = [];
             foreach ($entries as $entry) {
                 $concepts[] = $entry->concept;
             }
@@ -218,7 +218,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
         $choicescounter = 0;
         $questionscounter++;
         $questiontext = '';
-        $dragboxconcept = array();
+        $dragboxconcept = [];
 
         foreach ($entries as $entry) {
             if ($choicescounter == $nbchoices) {
@@ -276,7 +276,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
         $choicescounter = 0;
         $questionscounter++;
         $questiontext = '';
-        $dragboxconcept = array();
+        $dragboxconcept = [];
 
         foreach ($entries as $entry) {
             if ($choicescounter == $nbchoices) {
@@ -421,6 +421,17 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                    "</quiz>";
 ?>
 <?php
+/**
+ * Exports glossary entries to a quiz format.
+ *
+ * This file handles the functionality of exporting glossary entries into a quiz format
+ * within the Glossary Export to Quiz block.
+ *
+ * @package   block_glossary_export_to_quiz
+ * @copyright 2024 Joseph Rézeau moodle@rezeau.org
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 // Reset glossary export.
 $SESSION->block_glossary_export_to_quiz->status = '';
 
@@ -432,11 +443,12 @@ send_file($content, $filename, 0, 0, true, true);
  * @param int $indent the current indent level.
  * @param bool $short stick it on one line.
  * @return string formatted text.
+ * @package block_glossary_export_to_quiz
  */
 function writetext($raw, $indent = 0, $short = true) {
     $indent = str_repeat('  ', $indent);
     // If required add CDATA tags.
-    if (!empty($raw) and (htmlspecialchars($raw) != $raw)) {
+    if (!empty($raw) & (htmlspecialchars($raw) != $raw)) {
         $raw = "<![CDATA[$raw]]>";
     }
 
@@ -453,6 +465,7 @@ function writetext($raw, $indent = 0, $short = true) {
  * Generate the XML to represent some files.
  * @param array $files stored_file objects.
  * @return string $string the XML.
+ * @package block_glossary_export_to_quiz
  */
 function write_files($files) {
     global $mediafiles;
@@ -485,6 +498,7 @@ function write_files($files) {
  * @param string $maskconceptindefinitions
  * @param string $exportmediafiles
  * @return string cleaned text
+ * @package block_glossary_export_to_quiz
  */
 function strip_text ($text, $concept, $maskconceptindefinitions, $exportmediafiles) {
     $pattern = '/(<p[^>]*>|<\/p>|<div[^>]*>|<\/div>|<[bh]r ?\/?>|<a.*<\/a>)/';

@@ -24,8 +24,6 @@
 
 namespace block_glossary_export_to_quiz\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy Subsystem for block_glossary_export_to_quiz implementing null_provider.
  *
@@ -40,7 +38,7 @@ class provider implements \core_privacy\local\metadata\null_provider {
      *
      * @return  string
      */
-    public static function get_reason() : string {
+    public static function get_reason(): string {
         return 'privacy:metadata';
     }
 }

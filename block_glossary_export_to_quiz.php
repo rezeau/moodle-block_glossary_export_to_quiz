@@ -25,8 +25,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Block glossary_export_to_quiz definition.
  *
@@ -35,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class block_glossary_export_to_quiz extends block_base {
 
-	/** @var stdClass course data. */
+    /** @var stdClass course data. */
     public $course;
     /**
 
@@ -51,7 +49,7 @@ class block_glossary_export_to_quiz extends block_base {
       * @return array
       */
     public function applicable_formats() {
-        return array('all' => true);
+        return ['all' => true];
     }
 
     /**
@@ -64,7 +62,7 @@ class block_glossary_export_to_quiz extends block_base {
         require_once($CFG->libdir . '/filelib.php');
         // Needed for getting available question types.
         require_once($CFG->libdir . '/questionlib.php');
-		$this->course = $this->page->course;
+        $this->course = $this->page->course;
         // Load userdefined title and make sure it's never empty.
         if (empty($this->config->title)) {
             $this->title = get_string('pluginname', 'block_glossary_export_to_quiz');
@@ -100,7 +98,7 @@ class block_glossary_export_to_quiz extends block_base {
             return;
         }
         // Get list of all current course glossaries.
-        $glossaries = $DB->get_records_menu('glossary', array('course' => $this->course->id));
+        $glossaries = $DB->get_records_menu('glossary', ['course' => $this->course->id]);
 
         // No glossary available in current course -> return.
         if (empty($glossaries)) {
@@ -138,7 +136,7 @@ class block_glossary_export_to_quiz extends block_base {
         $numentries = 0;
         if (isset ($categories[1]) && $categories[1] != 0) {
             $categoryid = $categories[1];
-            $category = $DB->get_record('glossary_categories', array('id' => $categoryid));
+            $category = $DB->get_record('glossary_categories', ['id' => $categoryid]);
             $sql = "SELECT COUNT(*) "
                 ." FROM mdl_glossary_entries ge , mdl_glossary_entries_categories c "
                 . " WHERE ge.glossaryid = $glossaryid "
@@ -149,7 +147,7 @@ class block_glossary_export_to_quiz extends block_base {
                 $category->name.'</em>';
         } else {
             $categoryid = '';
-            $entriescount = $DB->count_records("glossary_entries", array('glossaryid' => $glossaryid));
+            $entriescount = $DB->count_records("glossary_entries", ['glossaryid' => $glossaryid]);
             $categoryname = '<b>'.get_string('category', 'glossary').'</b>: '.
                 get_string('allentries', 'block_glossary_export_to_quiz');
         }
@@ -172,14 +170,14 @@ class block_glossary_export_to_quiz extends block_base {
 
                 break;
             case 2:     // Type multichoice.
-                $stranswernumbering = array(
+                $stranswernumbering = [
                     0 => 'abc',
                     1 => 'ABCD',
                     2 => '123',
                     3 => 'iii',
                     4 => 'IIII',
-                    5 => 'none'
-                );
+                    5 => 'none',
+                ];
                 $nbchoices = $this->config->nbchoices - 1;
                 $answernumbering = $stranswernumbering[$this->config->answernumbering];
                 $shuffleanswers = $this->config->shuffleanswers;
@@ -226,12 +224,12 @@ class block_glossary_export_to_quiz extends block_base {
         $questiontype[3] = 'matching';
         $questiontype[4] = 'ddwtos';
 
-        $strquestiontypes = array(
+        $strquestiontypes = [
             1 => get_string('pluginname', 'qtype_shortanswer'),
             2 => get_string('pluginname', 'qtype_multichoice'),
             3 => get_string('pluginname', 'qtype_match'),
-            4 => get_string('pluginname', 'qtype_ddwtos')
-        );
+            4 => get_string('pluginname', 'qtype_ddwtos'),
+        ];
         // JR DECEMBER 2018 added the gapfill question type.
         $createabletypes = question_bank::get_creatable_qtypes();
         if (array_key_exists('gapfill', $createabletypes)) {

@@ -43,7 +43,7 @@ $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
 $exportmediafiles = optional_param('exportmediafiles', '', PARAM_ALPHANUM);
 $maskconceptindefinitions = optional_param('maskconceptindefinitions', '', PARAM_ALPHANUM);
 $extrawronganswer = optional_param('extrawronganswer', '', PARAM_ALPHANUM);
-$url = new moodle_url('/mod/glossary/export.php', array('id' => $id));
+$url = new moodle_url('/mod/glossary/export.php', ['id' => $id]);
 if ($cat !== 0) {
     $url->param('cat', $cat);
 }
@@ -54,11 +54,11 @@ if (! $cm = get_coursemodule_from_id('glossary', $id)) {
     throw new moodle_exception('invalidcoursemodule');
 }
 
-if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
+if (! $course = $DB->get_record("course", ["id" => $cm->course])) {
     throw new moodle_exception('coursemisconf');
 }
 
-if (! $glossary = $DB->get_record("glossary", array("id" => $cm->instance))) {
+if (! $glossary = $DB->get_record("glossary", ["id" => $cm->instance])) {
     throw new moodle_exception('invalidid', 'glossary');
 }
 
@@ -103,8 +103,8 @@ echo ('
     </form>
 ');
 
-    $courseurl = new moodle_url("/course/view.php", array('id' => $course->id));
-    echo html_writer::start_tag('div', array('class' => 'buttons'));
+    $courseurl = new moodle_url("/course/view.php", ['id' => $course->id]);
+    echo html_writer::start_tag('div', ['class' => 'buttons']);
     echo $OUTPUT->single_button($courseurl, get_string('returntocourse', 'block_completionstatus'), 'get');
     echo html_writer::end_tag('div');
     echo $OUTPUT->box_end();
