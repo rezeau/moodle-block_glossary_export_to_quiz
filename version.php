@@ -28,4 +28,4 @@ $plugin->version   = 2024042700;        // The current plugin version (Date: YYY
 $plugin->requires  = 2023100900;        // Requires this Moodle version.
 $plugin->component = 'block_glossary_export_to_quiz';  // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.4 for moodle 4.4+';
+$plugin->release = '4.5';
