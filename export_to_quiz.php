@@ -35,6 +35,7 @@ $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
 $entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
 $nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
 $usecase = optional_param('usecase', '', PARAM_ALPHANUM);
+$nbmaxtrieswordle = optional_param('nbmaxtrieswordle', '', PARAM_ALPHANUM);
 $answernumbering = optional_param('answernumbering', '', PARAM_ALPHANUM);
 $shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
 $answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
@@ -92,6 +93,7 @@ echo ('
     <input type="hidden" name="entriescount" value='.$entriescount.' />
     <input type="hidden" name="nbchoices" value='.$nbchoices.' />
     <input type="hidden" name="usecase" value='.$usecase.' />
+    <input type="hidden" name="nbmaxtrieswordle" value='.$nbmaxtrieswordle.' />
     <input type="hidden" name="answernumbering" value='.$answernumbering.' />
     <input type="hidden" name="shuffleanswers" value='.$shuffleanswers.' />
     <input type="hidden" name="answerdisplay" value='.$answerdisplay.' />

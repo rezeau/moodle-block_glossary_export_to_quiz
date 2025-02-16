@@ -206,11 +206,11 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                         14 => '14',
                     ];
                     // Maximum number of tries to guess the word.
-                    $mform->addElement('select', 'nbmaxtrieswordle',
+                    $mform->addElement('select', 'config_nbmaxtrieswordle',
                             get_string('nbmaxtrieswordle', 'qtype_guessit'), $nbmaxtrieswordle);
-                    $mform->addHelpButton('nbmaxtrieswordle', 'nbmaxtrieswordle', 'qtype_guessit');
-                    $mform->setDefault('nbmaxtrieswordle', 10);
-                    $mform->hideIf('nbmaxtrieswordle', 'config_questiontype', 'neq', 6);
+                    $mform->addHelpButton('config_nbmaxtrieswordle', 'nbmaxtrieswordle', 'qtype_guessit');
+                    $mform->setDefault('config_nbmaxtrieswordle', 10);
+                    $mform->hideIf('config_nbmaxtrieswordle', 'config_questiontype', 'neq', 6);
                 }
 
                 $mform->addElement('select', 'config_nbchoices',

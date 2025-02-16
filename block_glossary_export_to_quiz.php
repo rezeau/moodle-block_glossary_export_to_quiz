@@ -156,6 +156,7 @@ class block_glossary_export_to_quiz extends block_base {
         $qtype = $this->config->questiontype;
         // Initialize options.
         $usecase = '';
+        $nbmaxtrieswordle = '';
         $exportmediafiles = $this->config->exportmediafiles;
         $answerdisplay = '';
         $extrawronganswer = $this->config->extrawronganswer;
@@ -193,6 +194,7 @@ class block_glossary_export_to_quiz extends block_base {
                     $answerdisplay = $this->config->answerdisplay;
                 }
             case 6:     // Type guessit:wordle.
+                $nbchoices = $this->config->nbchoices;
                 $nbmaxtrieswordle = $this->config->nbmaxtrieswordle;
             break;
         }
