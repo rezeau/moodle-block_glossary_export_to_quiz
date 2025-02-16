@@ -155,6 +155,13 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     $gapfillinstalled = true;
                     $strquestiontypes[5] = get_string('pluginname', 'qtype_gapfill');
                 };
+                /// FEBRUARY 2025 add guessit q_type.                
+                $guessitinstalled = false;
+                $createabletypes = question_bank::get_creatable_qtypes();
+                if (array_key_exists('guessit', $createabletypes)) {
+                    $guessitinstalled = true;
+                    $strquestiontypes[6] = get_string('wordle', 'qtype_guessit');
+                };
 
                 $mform->addElement('select', 'config_questiontype',
                     get_string('selectquestiontype', 'quiz'), $strquestiontypes);
@@ -191,6 +198,21 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     $mform->hideIf('config_fixedgapsize', 'config_questiontype', 'neq', 5);
                     $mform->hideIf('config_fixedgapsize', 'config_glossary', 'eq', 0);
                 }
+                if ($guessitinstalled) {
+                    $nbmaxtrieswordle = [
+                        6 => '6',
+                        8 => '8',
+                        10 => '10',
+                        12 => '12',
+                        14 => '14',
+                    ];
+                    // Maximum number of tries to guess the word.
+                    $mform->addElement('select', 'nbmaxtrieswordle',
+                            get_string('nbmaxtrieswordle', 'qtype_guessit'), $nbmaxtrieswordle);
+                    $mform->addHelpButton('nbmaxtrieswordle', 'nbmaxtrieswordle', 'qtype_guessit');
+                    $mform->setDefault('nbmaxtrieswordle', 10);
+                    $mform->hideIf('nbmaxtrieswordle', 'config_questiontype', 'neq', 6);
+                }
 
                 $mform->addElement('select', 'config_nbchoices',
                     get_string('nbchoices', 'block_glossary_export_to_quiz'), $nbchoices);
@@ -199,6 +221,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->hideIf('config_nbchoices', 'config_questiontype', 'eq', 0);
                 $mform->hideIf('config_nbchoices', 'config_questiontype', 'eq', 1);
                 $mform->hideIf('config_nbchoices', 'config_glossary', 'eq', 0);
+                $mform->hideIf('config_nbchoices', 'config_questiontype', 'eq', 6);
 
                 // Matching & drag&drop text add an extra wrong answer.
                 $mform->addElement('selectyesno', 'config_extrawronganswer',
@@ -209,6 +232,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 0);
                 $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 2);
                 $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 1);
+                $mform->hideIf('config_extrawronganswer', 'config_questiontype', 'eq', 6);
                 $mform->hideIf('config_extrawronganswer', 'config_glossary', 'eq', 0);
 
                 // Answer numbering for multichoice questions.
@@ -233,6 +257,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 0);
                 $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 1);
                 $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 5);
+                $mform->hideIf('config_shuffleanswers', 'config_questiontype', 'eq', 6);
 
                 // Short answer usecase.
                 $mform->addElement('selectyesno', 'config_usecase',
