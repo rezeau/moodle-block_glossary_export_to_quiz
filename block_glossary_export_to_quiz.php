@@ -192,8 +192,8 @@ class block_glossary_export_to_quiz extends block_base {
                 if (isset($this->config->answerdisplay)) {
                     $answerdisplay = $this->config->answerdisplay;
                 }
-            ///case 6:     // Type guessit:wordle.
-               /// $nbmaxtrieswordle = $this->config->nbmaxtrieswordle;
+            case 6:     // Type guessit:wordle.
+                $nbmaxtrieswordle = $this->config->nbmaxtrieswordle;
             break;
         }
 

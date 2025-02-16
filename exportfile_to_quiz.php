@@ -37,6 +37,7 @@ $cat = optional_param('cat', 0, PARAM_ALPHANUM);
 $limitnum = optional_param('limitnum', '', PARAM_ALPHANUM);
 $nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
 $usecase = optional_param('usecase', '', PARAM_ALPHANUM);
+$nbmaxtrieswordle = optional_param('nbmaxtrieswordle', '', PARAM_ALPHANUM);
 $answernumbering = optional_param('answernumbering', '', PARAM_ALPHANUM);
 $shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
 $answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
@@ -135,7 +136,7 @@ switch ($questiontype) {
         $questiontypeabbr = ' GAPFILL';
         break;
     case 'guessit':
-        $questiontypeabbr = ' GUESSIT:WORDLE';
+        $questiontypeabbr = ' GUESSIT_WORDLE';
         break;
 }
 
@@ -275,6 +276,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $expout .= "      </dragbox>\n";
         }
         $expout .= "</question>\n";
+
     } else if ($questiontype == 'gapfill') {
         $choicescounter = 0;
         $questionscounter++;
@@ -350,7 +352,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
         $expout .= "</question>\n";
 
     } else {
-        foreach ($entries as $entry) { // Question types multichoice and shortanswer.
+        foreach ($entries as $entry) { // Question types multichoice or  shortanswer or guessitwordle.
             $questionscounter++;
             $concept = $entry->concept;
             $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
@@ -405,6 +407,14 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     break;
                 case 'shortanswer':
                     $expout .= "    <usecase>$usecase</usecase>\n ";
+                    $percent = 100;
+                    $expout .= "    <answer fraction=\"$percent\">\n";
+                    $expout .= writetext( $concept, 3, false );
+                    $expout .= "    </answer>\n";
+                    $expout .= "</question>\n";
+                    break;
+                case 'guessit':
+                    $expout .= "    <nbmaxtrieswordle>$nbmaxtrieswordle</nbmaxtrieswordle>\n ";
                     $percent = 100;
                     $expout .= "    <answer fraction=\"$percent\">\n";
                     $expout .= writetext( $concept, 3, false );
