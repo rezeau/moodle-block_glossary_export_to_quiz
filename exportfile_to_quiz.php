@@ -134,6 +134,9 @@ switch ($questiontype) {
     case 'gapfill':
         $questiontypeabbr = ' GAPFILL';
         break;
+    case 'guessit':
+        $questiontypeabbr = ' GUESSIT:WORDLE';
+        break;
 }
 
 $giftcategoryname .= ' '.$numquestions.$questiontypeabbr;

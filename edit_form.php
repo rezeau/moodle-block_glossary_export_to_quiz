@@ -157,12 +157,13 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 };
                 /// FEBRUARY 2025 add guessit q_type.                
                 $guessitinstalled = false;
+                /*
                 $createabletypes = question_bank::get_creatable_qtypes();
                 if (array_key_exists('guessit', $createabletypes)) {
                     $guessitinstalled = true;
                     $strquestiontypes[6] = get_string('wordle', 'qtype_guessit');
                 };
-
+                */
                 $mform->addElement('select', 'config_questiontype',
                     get_string('selectquestiontype', 'quiz'), $strquestiontypes);
                 $mform->setDefault('config_questiontype', 0);

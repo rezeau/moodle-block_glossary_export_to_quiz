@@ -192,6 +192,8 @@ class block_glossary_export_to_quiz extends block_base {
                 if (isset($this->config->answerdisplay)) {
                     $answerdisplay = $this->config->answerdisplay;
                 }
+            ///case 6:     // Type guessit:wordle.
+               /// $nbmaxtrieswordle = $this->config->nbmaxtrieswordle;
             break;
         }
 
@@ -235,6 +237,13 @@ class block_glossary_export_to_quiz extends block_base {
         if (array_key_exists('gapfill', $createabletypes)) {
             $questiontype[5] = 'gapfill';
             $strquestiontypes[5] = get_string('pluginname', 'qtype_gapfill');
+        };
+
+        // JR FEBRUARY 2025 added the guessit:wordle question type.
+        $createabletypes = question_bank::get_creatable_qtypes();
+        if (array_key_exists('guessit', $createabletypes)) {
+            $questiontype[6] = 'guessit';
+            $strquestiontypes[6] = get_string('pluginname', 'qtype_guessit');
         };
 
         // Just in case a new question type has been removed after creating an export glossary.
