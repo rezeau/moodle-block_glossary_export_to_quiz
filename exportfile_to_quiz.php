@@ -413,12 +413,22 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     $expout .= "    </answer>\n";
                     $expout .= "</question>\n";
                     break;
+
                 case 'guessit':
+                    $defaultgrade = '5'; // todo calculate nb of letters in concept                    
+                    $penalty = '0';
+                    $gapsizedisplay = 'gapsizegrow';
+                    $nbtriesbeforehelp = '6';
+                    $nbmaxtrieswordle = '6';
+                    $removespecificfeedback = '0';
+
+                    $expout .= "    <penalty>$penalty</penalty>\n ";
+                    $expout .= "    <guessitgaps>" . writetext( $concept, 3, false ) . "</guessitgaps>\n ";
+                    $expout .= "    <gapsizedisplay>$gapsizedisplay</gapsizedisplay>\n ";
+                    $expout .= "    <nbtriesbeforehelp>$nbtriesbeforehelp</nbtriesbeforehelp>\n ";
                     $expout .= "    <nbmaxtrieswordle>$nbmaxtrieswordle</nbmaxtrieswordle>\n ";
-                    $percent = 100;
-                    $expout .= "    <answer fraction=\"$percent\">\n";
-                    $expout .= writetext( $concept, 3, false );
-                    $expout .= "    </answer>\n";
+                    $expout .= "    <removespecificfeedback>$removespecificfeedback</removespecificfeedback>\n ";
+                    $expout .= "    <wordle>1</wordle>\n ";
                     $expout .= "</question>\n";
                     break;
             }
