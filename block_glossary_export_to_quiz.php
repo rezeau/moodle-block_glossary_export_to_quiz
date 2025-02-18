@@ -194,7 +194,6 @@ class block_glossary_export_to_quiz extends block_base {
                     $answerdisplay = $this->config->answerdisplay;
                 }
             case 6:     // Type guessit:wordle.
-                $nbchoices = $this->config->nbchoices;
                 $nbmaxtrieswordle = $this->config->nbmaxtrieswordle;
             break;
         }
@@ -205,7 +204,7 @@ class block_glossary_export_to_quiz extends block_base {
         } else {
             $numentries = $entriescount;
         }
-        if ($qtype > 2) { // Matching or drag&drop question.
+        if ($qtype > 2 && $qtype < 6) { // Matching or drag&drop question. But NOT guessit.
             $nbchoices += $extrawronganswer;
             $limitnum = floor ($numentries / $nbchoices ) * $nbchoices;
             $numentries = $limitnum;

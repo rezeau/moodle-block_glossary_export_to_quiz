@@ -353,84 +353,92 @@ if ( $entries = $DB->get_records_sql($sql) ) {
 
     } else {
         foreach ($entries as $entry) { // Question types multichoice or  shortanswer or guessitwordle.
-            $questionscounter++;
             $concept = $entry->concept;
-            $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
-            $expout .= "\n\n<!-- question: $questionscounter  -->\n";
-            $nametext = writetext( $concept );
-            $qtformat = "html";
-            $expout .= "  <question type=\"$questiontype\">\n";
-            $expout .= "    <name>$nametext</name>\n";
-            $expout .= "    <questiontext format=\"$qtformat\">\n";
-            $expout .= writetext($definition, 0);
-            if ($exportmediafiles) {
-                $fs = get_file_storage();
-                $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
-                $expout .= write_files($entryfiles);
-            }
-            $expout .= "    </questiontext>\n";
+            // Do not export a guessit wordle concept containing more than ONE word.
+            if ($questiontype == 'multichoice' || $questiontype == 'shortanswer' || ($questiontype == 'guessit' && str_word_count($concept) == 1) ) {
+                $questionscounter++;
+                $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
+                $expout .= "\n\n<!-- question: $questionscounter  -->\n";
+                $nametext = writetext( $concept );
+                $qtformat = "html";
+                $expout .= "  <question type=\"$questiontype\">\n";
+                $expout .= "    <name>$nametext</name>\n";
+                $expout .= "    <questiontext format=\"$qtformat\">\n";
+                if ($questiontype == 'guessit') {
+                    $definition .= '<br>'; 
+                }
+                $expout .= writetext($definition, 0);
+                
+                if ($exportmediafiles) {
+                    $fs = get_file_storage();
+                    $entryfiles = $fs->get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+                    $expout .= write_files($entryfiles);
+                }
+                $expout .= "    </questiontext>\n";
 
-            switch ($questiontype) {
-                case 'multichoice':
-                    $expout .= "    <shuffleanswers>true</shuffleanswers>\n";
-                    $expout .= "    <answernumbering>".$answernumbering."</answernumbering>\n";
-                    $concepts2 = $concepts;
-                    foreach ($concepts2 as $key => $value) {
-                        if ($value == $concept) {
-                            unset($concepts2[$key]);
+                switch ($questiontype) {
+                    case 'multichoice':
+                        $expout .= "    <shuffleanswers>true</shuffleanswers>\n";
+                        $expout .= "    <answernumbering>".$answernumbering."</answernumbering>\n";
+                        $concepts2 = $concepts;
+                        foreach ($concepts2 as $key => $value) {
+                            if ($value == $concept) {
+                                unset($concepts2[$key]);
+                            }
                         }
-                    }
-                    $randkeys = array_rand($concepts2, $nbchoices);
-                    for ($i = 0; $i < $nbchoices + 1; $i++) {
-                        if ($i === 0) {
-                            $percent = 100;
-                            $expout .= "      <answer fraction=\"$percent\">\n";
-                            $expout .= writetext( $concept, 3, false )."\n";
-                            $expout .= "      <feedback>\n";
-                            $expout .= "      <text>\n";
-                            $expout .= "      </text>\n";
-                            $expout .= "      </feedback>\n";
-                            $expout .= "    </answer>\n";
-                        } else {
-                            $percent = 0;
-                            $distracter = $concepts2[$randkeys[$i - 1]];
-                            $expout .= "      <answer fraction=\"$percent\">\n";
-                            $expout .= writetext( $distracter, 3, false )."\n";
-                            $expout .= "      <feedback>\n";
-                            $expout .= "      <text>\n";
-                            $expout .= "      </text>\n";
-                            $expout .= "      </feedback>\n";
-                            $expout .= "    </answer>\n";
+                        $randkeys = array_rand($concepts2, $nbchoices);
+                        for ($i = 0; $i < $nbchoices + 1; $i++) {
+                            if ($i === 0) {
+                                $percent = 100;
+                                $expout .= "      <answer fraction=\"$percent\">\n";
+                                $expout .= writetext( $concept, 3, false )."\n";
+                                $expout .= "      <feedback>\n";
+                                $expout .= "      <text>\n";
+                                $expout .= "      </text>\n";
+                                $expout .= "      </feedback>\n";
+                                $expout .= "    </answer>\n";
+                            } else {
+                                $percent = 0;
+                                $distracter = $concepts2[$randkeys[$i - 1]];
+                                $expout .= "      <answer fraction=\"$percent\">\n";
+                                $expout .= writetext( $distracter, 3, false )."\n";
+                                $expout .= "      <feedback>\n";
+                                $expout .= "      <text>\n";
+                                $expout .= "      </text>\n";
+                                $expout .= "      </feedback>\n";
+                                $expout .= "    </answer>\n";
+                            }
                         }
-                    }
-                    $expout .= "</question>\n";
-                    break;
-                case 'shortanswer':
-                    $expout .= "    <usecase>$usecase</usecase>\n ";
-                    $percent = 100;
-                    $expout .= "    <answer fraction=\"$percent\">\n";
-                    $expout .= writetext( $concept, 3, false );
-                    $expout .= "    </answer>\n";
-                    $expout .= "</question>\n";
-                    break;
+                        $expout .= "</question>\n";
+                        break;
+                    case 'shortanswer':
+                        $expout .= "    <usecase>$usecase</usecase>\n ";
+                        $percent = 100;
+                        $expout .= "    <answer fraction=\"$percent\">\n";
+                        $expout .= writetext( $concept, 3, false );
+                        $expout .= "    </answer>\n";
+                        $expout .= "</question>\n";
+                        break;
 
-                case 'guessit':
-                    $defaultgrade = '5'; // todo calculate nb of letters in concept                    
-                    $penalty = '0';
-                    $gapsizedisplay = 'gapsizegrow';
-                    $nbtriesbeforehelp = '6';
-                    $nbmaxtrieswordle = '6';
-                    $removespecificfeedback = '0';
-
-                    $expout .= "    <penalty>$penalty</penalty>\n ";
-                    $expout .= "    <guessitgaps>" . writetext( $concept, 3, false ) . "</guessitgaps>\n ";
-                    $expout .= "    <gapsizedisplay>$gapsizedisplay</gapsizedisplay>\n ";
-                    $expout .= "    <nbtriesbeforehelp>$nbtriesbeforehelp</nbtriesbeforehelp>\n ";
-                    $expout .= "    <nbmaxtrieswordle>$nbmaxtrieswordle</nbmaxtrieswordle>\n ";
-                    $expout .= "    <removespecificfeedback>$removespecificfeedback</removespecificfeedback>\n ";
-                    $expout .= "    <wordle>1</wordle>\n ";
-                    $expout .= "</question>\n";
-                    break;
+                    case 'guessit':  
+                        $concept = strtoupper($concept);
+                        $defaultgrade = strlen($concept);
+                        $penalty = '0';
+                        $gapsizedisplay = 'gapsizegrow';
+                        $nbtriesbeforehelp = '6';
+                        $nbmaxtrieswordle = '6';
+                        $removespecificfeedback = '0';
+                        $expout .= "    <defaultgrade>$defaultgrade</defaultgrade>\n ";
+                        $expout .= "    <penalty>$penalty</penalty>\n ";
+                        $expout .= "    <guessitgaps>" . $concept . "</guessitgaps>\n ";
+                        $expout .= "    <gapsizedisplay>$gapsizedisplay</gapsizedisplay>\n ";
+                        $expout .= "    <nbtriesbeforehelp>$nbtriesbeforehelp</nbtriesbeforehelp>\n ";
+                        $expout .= "    <nbmaxtrieswordle>$nbmaxtrieswordle</nbmaxtrieswordle>\n ";
+                        $expout .= "    <removespecificfeedback>$removespecificfeedback</removespecificfeedback>\n ";
+                        $expout .= "    <wordle>1</wordle>\n ";
+                        $expout .= "</question>\n";
+                        break;
+                }
             }
         }
         // Close the question tag.

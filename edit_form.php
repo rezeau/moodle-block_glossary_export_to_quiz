@@ -312,7 +312,9 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         } else {
             $maxentries = $glossarynumentries;
         }
-        if ($questiontype > 1) {
+        if ($questiontype == 6) {
+           /// Try to skip concepts of more than 1 word.
+        } else if ($questiontype > 1) {
             $data['config_nbchoices'] += $data['config_extrawronganswer'];
             $nbchoices = $data['config_nbchoices'];
             if ($questiontype > 1) { // Multichoice / matching / draganddrop.
