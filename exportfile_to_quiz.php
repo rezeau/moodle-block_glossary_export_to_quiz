@@ -38,6 +38,7 @@ $limitnum = optional_param('limitnum', '', PARAM_ALPHANUM);
 $nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
 $usecase = optional_param('usecase', '', PARAM_ALPHANUM);
 $nbmaxtrieswordle = optional_param('nbmaxtrieswordle', '', PARAM_ALPHANUM);
+$nbmaxletterswordle = optional_param('nbmaxletterswordle', '', PARAM_ALPHANUM);
 $answernumbering = optional_param('answernumbering', '', PARAM_ALPHANUM);
 $shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
 $answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
@@ -72,6 +73,7 @@ define('BGETQ_RANDOMLY',     '3');
 
 switch ($sortorder) {
     case BGETQ_RANDOMLY:
+    case BGETQ_RANDOMLY:
         $sortorder = 'ORDER BY RAND()';
         // May be slow on a very large glossary, see
         // http://www.titov.net/2005/09/21/do-not-use-order-by-rand-or-how-to-get-random-rows-from-table/ please.
@@ -96,6 +98,7 @@ if ($limitnum) {
 $catfrom = "";
 $catwhere = "";
 $giftcategoryname = $glossary->name;
+$glossaryid = $glossary->id;
 if ($cat) {
     $category = $DB->get_record('glossary_categories', ['id' => $cat]);
     $categoryname = $category->name;
@@ -104,13 +107,13 @@ if ($cat) {
     $catwhere = "and ge.id = c.entryid and c.categoryid = $cat";
 }
 
-$sql = "SELECT ge.id, ge.concept, ge.definition "
-." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
-. "WHERE ge.glossaryid = $glossary->id "
-. "AND ge.approved = 1 "
-. "$catwhere "
-. "$sortorder "
-. "$limit";
+    $sql = "SELECT ge.id, ge.concept, ge.definition "
+        ." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
+        . "WHERE ge.glossaryid = $glossaryid "
+        . "AND ge.approved = 1 "
+        . "$catwhere "
+        . "$sortorder "
+        . "$limit";
 
 // Build XML file - based on moodle/question/xml/format.php.
 // Add opening tag.
@@ -184,6 +187,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             if ($subquestionscounter == $nbchoices) {
                 $subquestionscounter = 0;
                 // Close the question tag.
+                $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
                 $expout .= "</question>\n";
             }
             if ($subquestionscounter === 0) { // Start new matching question.
@@ -217,6 +221,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $subquestionscounter++;
         }
         // Close the last question tag.
+        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
         $expout .= "</question>\n";
     } else if ($questiontype == 'ddwtos') {
         $choicescounter = 0;
@@ -236,7 +241,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     $expout .= writetext($dragboxconcept[$j], $nbchoices);
                     $expout .= "      </dragbox>\n";
                 }
-
+                $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
                 $expout .= "</question>\n";
             }
             if ($choicescounter == 0) { // Start a new ddwtos question.
@@ -275,6 +280,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $expout .= writetext($dragboxconcept[$j], $nbchoices);
             $expout .= "      </dragbox>\n";
         }
+        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
         $expout .= "</question>\n";
 
     } else if ($questiontype == 'gapfill') {
@@ -303,7 +309,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     $expout .= writetext($dragboxconcept[$j], $nbchoices);
                     $expout .= "      </answer>\n";
                 }
-
+                $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
                 $expout .= "</question>\n";
             }
             if ($choicescounter == 0) { // Start a new question.
@@ -349,13 +355,17 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $expout .= writetext($dragboxconcept[$j], $nbchoices);
             $expout .= "      </answer>\n";
         }
+        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
         $expout .= "</question>\n";
 
     } else {
         foreach ($entries as $entry) { // Question types multichoice or  shortanswer or guessitwordle.
             $concept = $entry->concept;
             // Do not export a guessit wordle concept containing more than ONE word.
-            if ($questiontype == 'multichoice' || $questiontype == 'shortanswer' || ($questiontype == 'guessit' && str_word_count($concept) == 1) ) {
+            ///$nbmaxletterswordle = 5;
+            if ($questiontype == 'multichoice' || $questiontype == 'shortanswer'
+                || ($questiontype == 'guessit' && str_word_count($concept) == 1
+                && strlen($concept) > 4 && strlen($concept) <= $nbmaxletterswordle ) ) {
                 $questionscounter++;
                 $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
                 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
@@ -409,6 +419,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                                 $expout .= "    </answer>\n";
                             }
                         }
+                        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
                         $expout .= "</question>\n";
                         break;
                     case 'shortanswer':
@@ -417,6 +428,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                         $expout .= "    <answer fraction=\"$percent\">\n";
                         $expout .= writetext( $concept, 3, false );
                         $expout .= "    </answer>\n";
+                        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
                         $expout .= "</question>\n";
                         break;
 
@@ -436,10 +448,11 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                         $expout .= "    <nbmaxtrieswordle>$nbmaxtrieswordle</nbmaxtrieswordle>\n ";
                         $expout .= "    <removespecificfeedback>$removespecificfeedback</removespecificfeedback>\n ";
                         $expout .= "    <wordle>1</wordle>\n ";
+                        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
                         $expout .= "</question>\n";
                         break;
                 }
-            }
+           }
         }
         // Close the question tag.
     }

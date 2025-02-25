@@ -164,6 +164,8 @@ class block_glossary_export_to_quiz extends block_base {
         $shuffleanswers = '';
         $answernumbering = '';
         $nbchoices = '';
+        $nbmaxtrieswordle = '';
+        $nbmaxletterswordle = '';
 
         switch ($qtype) {
             case 1:     // Type shortanswer.
@@ -195,6 +197,7 @@ class block_glossary_export_to_quiz extends block_base {
                 }
             case 6:     // Type guessit:wordle.
                 $nbmaxtrieswordle = $this->config->nbmaxtrieswordle;
+                $nbmaxletterswordle = $this->config->nbmaxletterswordle;
             break;
         }
 
@@ -212,9 +215,13 @@ class block_glossary_export_to_quiz extends block_base {
         } else {
             $numquestions = $numentries;
         }
-
-        $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz',
-            $numentries).get_string('numquestions', 'block_glossary_export_to_quiz', $numquestions);
+        // For all question types except guessit where final number of questions created is unknown.
+        if ($qtype < 6) {
+            $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz',
+                $numentries).get_string('numquestions', 'block_glossary_export_to_quiz', $numquestions);
+        } else {
+            $strnumentries = '<br />'.get_string('exporttoquessit', 'block_glossary_export_to_quiz');
+        }
 
         $sortorder = $this->config->sortingorder;
         $type[0] = get_string('concept', 'block_glossary_export_to_quiz');
@@ -267,12 +274,21 @@ class block_glossary_export_to_quiz extends block_base {
             $strsortorder. '<br />'.$strquestiontype;
         $this->content->footer = '<a title="'.$title.'" href='
             .$CFG->wwwroot.'/blocks/glossary_export_to_quiz/export_to_quiz.php?id='
-            .$cmid.'&amp;cat='.$categoryid.'&amp;limitnum='.$limitnum.'&amp;questiontype='.$questiontype
-            .'&amp;sortorder='.$sortorder.'&amp;usecase='.$usecase.'&amp;exportmediafiles='.$exportmediafiles
+            .$cmid.'&amp;cat='.$categoryid
+            .'&amp;limitnum='.$limitnum
+            .'&amp;questiontype='.$questiontype
+            .'&amp;sortorder='.$sortorder
+            .'&amp;usecase='.$usecase
+            .'&amp;exportmediafiles='.$exportmediafiles
             .'&amp;maskconceptindefinitions='.$maskconceptindefinitions
-            .'&amp;nbchoices='.$nbchoices.'&amp;extrawronganswer='.$extrawronganswer
-            .'&amp;numquestions='.$numquestions.'&amp;answernumbering='.$answernumbering
-            .'&amp;shuffleanswers='.$shuffleanswers.'&amp;answerdisplay='.$answerdisplay.'>'
+            .'&amp;nbchoices='.$nbchoices
+            .'&amp;extrawronganswer='.$extrawronganswer
+            .'&amp;numquestions='.$numquestions
+            .'&amp;answernumbering='.$answernumbering
+            .'&amp;shuffleanswers='.$shuffleanswers
+            .'&amp;nbmaxtrieswordle='.$nbmaxtrieswordle
+            .'&amp;nbmaxletterswordle='.$nbmaxletterswordle
+            .'&amp;answerdisplay='.$answerdisplay.'>'
             .'<b>'.$strnumentries.'</b></a>';
         return $this->content;
     }

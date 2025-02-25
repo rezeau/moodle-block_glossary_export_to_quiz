@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['addidnumber'] = 'Add category and questions ID NUMBER';
+$string['addidnumber_help'] = 'Help for Add category and questions ID NUMBER';
 $string['allentries'] = 'All entries';
 $string['clicktoexport'] = 'Click to export this glossary\'s entries to quiz (XML)';
 $string['concept'] = 'Alphabetical order';
@@ -32,6 +34,7 @@ $string['exportentriestoxml'] = 'Export entries to Quiz (XML)';
 $string['exportmediafiles'] = 'Export images and audio/video files?';
 $string['exportmediafiles_help'] = 'Do you want to export the images/audio/video which may have been inserted into this glossary\'s definitions?
 Some question types are not really compatible with some media elements.';
+$string['exporttoquessit'] = 'Export entries to Guess It question(s)';
 $string['extrawronganswer'] = 'Add one extra wrong answer?';
 $string['extrawronganswer_help'] = 'Do you want to add an extra wrong answer/distracter to each of your questions?';
 $string['firstmodified'] = 'Oldest entries first';
@@ -48,6 +51,8 @@ $string['maskconceptindefinitions_help'] = 'If concept words appear in the text 
 $string['matchinstructions'] = 'Match the definitions and the concepts';
 $string['nbchoices'] = 'Number of choices';
 $string['nbchoices_help'] = 'Select how many choices/answers you want to make available.';
+$string['nbmaxletterswordle'] = 'Number of letters in wordle';
+$string['nbmaxletterswordle_help'] = 'Select the maximum length of concepts to select for wordle export. The minimum is 4';
 $string['noglossaries'] = 'No glossaries in this course';
 $string['notenoughentriesavailable'] = 'Not enough entries available ({$a->numentries}) for this question type (minimum {$a->nbchoices} entries needed).';
 $string['notenoughentriesselected'] = 'Not enough entries selected ({$a->numentries}) for this question type (minimum {$a->nbchoices} entries needed).';
