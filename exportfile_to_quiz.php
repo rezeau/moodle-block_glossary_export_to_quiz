@@ -45,7 +45,6 @@ $answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
 $numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
 $addidnumber = optional_param('addidnumber', 0, PARAM_ALPHANUM);
-$entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
 $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
 $exportmediafiles = optional_param('exportmediafiles', '', PARAM_ALPHANUM);
 $extrawronganswer = optional_param('extrawronganswer', '', PARAM_ALPHANUM);
@@ -95,9 +94,12 @@ if ($limitnum) {
 } else {
     $limit = '';
 }
+$questiontypeparams = explode("_", $questiontype);
+$questiontype = $questiontypeparams[0];
 
-$catfrom = "";
-$catwhere = "";
+$catfrom = '';
+$catwhere = '';
+$guessitwhere = '';
 $giftcategoryname = $glossary->name;
 $glossaryid = $glossary->id;
 if ($cat) {
@@ -107,21 +109,33 @@ if ($cat) {
     $catfrom = ", mdl_glossary_entries_categories c ";
     $catwhere = "and ge.id = c.entryid and c.categoryid = $cat";
 }
-
+if ($questiontype == 'guessit') {
+    $nbmaxletterswordle = $nbmaxletterswordle + 1;
+    $guessitwhere = "AND LENGTH(ge.concept) > 3 AND LENGTH(ge.concept) < $nbmaxletterswordle AND ge.concept NOT LIKE '% %'";
+}
 $sql = "SELECT ge.id, ge.concept, ge.definition "
     ." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
     . "WHERE ge.glossaryid = $glossaryid "
     . "AND ge.approved = 1 "
     . "$catwhere "
+    . "$guessitwhere "
     . "$sortorder "
     . "$limit";
 
+if ($questiontype == 'guessit') {
+    $sqlcount = "SELECT COUNT(*) "
+    ." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
+    . "WHERE ge.glossaryid = $glossaryid "
+    . "AND ge.approved = 1 "
+    . "$catwhere "
+    . "$guessitwhere "
+    . "$sortorder "
+    . "$limit";
+    $numquestions = $DB->count_records_sql($sqlcount);
+}
+
 // Build XML file - based on moodle/question/xml/format.php.
 // Add opening tag.
-$expout = "";
-$questionscounter = 0;
-$questiontypeparams = explode("_", $questiontype);
-$questiontype = $questiontypeparams[0];
 
 switch ($questiontype) {
     case 'multichoice':
@@ -146,7 +160,10 @@ switch ($questiontype) {
 
 $giftcategoryname .= ' '.$numquestions.$questiontypeabbr;
 $filename = clean_filename(format_string($giftcategoryname, true).' questions.xml');
-$expout .= "\n\n<!-- question: $questionscounter  -->\n";
+$questionscounter = 0;
+$expout = "";
+$categoryexpout = '';
+$categoryexpout .= "\n\n<!-- question: $questionscounter  -->\n";
 
 $categorypath = writetext( $giftcategoryname );
 $categoryidnumber = '';
@@ -159,7 +176,6 @@ $expout .= "        $categorypath\n";
 $expout .= "    </category>\n";
 $expout .= "    <idnumber>$categoryidnumber</idnumber>\n";
 $expout .= "  </question>\n";
-///$context = context_module::instance($cm->id);
 
 if ( $entries = $DB->get_records_sql($sql) ) {
     $instructions = '';
@@ -369,9 +385,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $concept = $entry->concept;
             // Do not export a guessit wordle concept containing more than ONE word.
             ///$nbmaxletterswordle = 5;
-            if ($questiontype == 'multichoice' || $questiontype == 'shortanswer'
-                || ($questiontype == 'guessit' && str_word_count($concept) == 1
-                    && strlen($concept) > 4 && strlen($concept) <= $nbmaxletterswordle ) ) {
+            ///if ($questiontype == 'multichoice' || $questiontype == 'shortanswer' || $questiontype == 'guessit') {
                 $questionscounter++;
                 $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
                 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
@@ -407,7 +421,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                             if ($i === 0) {
                                 $percent = 100;
                                 $expout .= "      <answer fraction=\"$percent\">\n";
-                                $expout .= writetext( $concept, 3, false )."\n";
+                                $expout .=     writetext( $concept, 3, false )."\n";
                                 $expout .= "      <feedback>\n";
                                 $expout .= "      <text>\n";
                                 $expout .= "      </text>\n";
@@ -417,7 +431,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                                 $percent = 0;
                                 $distracter = $concepts2[$randkeys[$i - 1]];
                                 $expout .= "      <answer fraction=\"$percent\">\n";
-                                $expout .= writetext( $distracter, 3, false )."\n";
+                                $expout .=     writetext( $distracter, 3, false )."\n";
                                 $expout .= "      <feedback>\n";
                                 $expout .= "      <text>\n";
                                 $expout .= "      </text>\n";
@@ -432,7 +446,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                         $expout .= "    <usecase>$usecase</usecase>\n ";
                         $percent = 100;
                         $expout .= "    <answer fraction=\"$percent\">\n";
-                        $expout .= writetext( $concept, 3, false );
+                        $expout .=     writetext( $concept, 3, false );
                         $expout .= "    </answer>\n";
                         if ($addidnumber) {
                             $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
@@ -460,7 +474,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                         $expout .= "  </question>\n";
                         break;
                 }
-           }
+           ///}
         }
         // Close the question tag.
     }

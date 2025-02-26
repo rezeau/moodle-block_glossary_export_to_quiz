@@ -33,7 +33,6 @@ $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUM);
 $limitnum = optional_param('limitnum', '', PARAM_ALPHANUM);
 $addidnumber = optional_param('addidnumber', '', PARAM_ALPHANUM);
 $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
-$entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
 $nbchoices = optional_param('nbchoices', '', PARAM_ALPHANUM);
 $usecase = optional_param('usecase', '', PARAM_ALPHANUM);
 $nbmaxtrieswordle = optional_param('nbmaxtrieswordle', '', PARAM_ALPHANUM);
@@ -93,7 +92,6 @@ echo ('
     <input type="hidden" name="questiontype" value='.$questiontype.' />
     <input type="hidden" name="sortorder" value='.$sortorder.' />
     <input type="hidden" name="addidnumber" value='.$addidnumber.' />
-    <input type="hidden" name="entriescount" value='.$entriescount.' />
     <input type="hidden" name="nbchoices" value='.$nbchoices.' />
     <input type="hidden" name="usecase" value='.$usecase.' />
     <input type="hidden" name="nbmaxtrieswordle" value='.$nbmaxtrieswordle.' />

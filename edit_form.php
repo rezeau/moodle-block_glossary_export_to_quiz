@@ -99,12 +99,12 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                             }
                         }
                     } else {
-                        /*$sql = "SELECT COUNT(*) "
+                        $sql = "SELECT COUNT(*) "
                            ." FROM mdl_glossary_entries ge WHERE ge.glossaryid = $key "
                            ." AND ge.approved = 1 AND ge.concept NOT LIKE '% %' "
                            ." AND LENGTH(ge.concept) < 6";
                        $numentries = $DB->count_records_sql($sql);
-                       */
+                       
                     }
                 }
             }
