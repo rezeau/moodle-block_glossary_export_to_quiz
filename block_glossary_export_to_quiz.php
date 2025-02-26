@@ -166,6 +166,7 @@ class block_glossary_export_to_quiz extends block_base {
         $nbchoices = '';
         $nbmaxtrieswordle = '';
         $nbmaxletterswordle = '';
+        $addidnumber = $this->config->addidnumber;
 
         switch ($qtype) {
             case 1:     // Type shortanswer.
@@ -288,6 +289,7 @@ class block_glossary_export_to_quiz extends block_base {
             .'&amp;shuffleanswers='.$shuffleanswers
             .'&amp;nbmaxtrieswordle='.$nbmaxtrieswordle
             .'&amp;nbmaxletterswordle='.$nbmaxletterswordle
+            .'&amp;addidnumber='.$addidnumber
             .'&amp;answerdisplay='.$answerdisplay.'>'
             .'<b>'.$strnumentries.'</b></a>';
         return $this->content;

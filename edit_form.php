@@ -143,8 +143,12 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                                 get_string('limitnum', 'block_glossary_export_to_quiz'), ['size' => 5]);
                 $mform->addHelpButton('config_limitnum', 'limitnum', 'block_glossary_export_to_quiz');
                 $mform->setDefault('config_limitnum', '');
-                $mform->setType('config_limitnum', PARAM_INTEGER);
+                $mform->setType('config_limitnum', PARAM_RAW);
                 $mform->hideIf('config_limitnum', 'config_glossary', 'eq', 0);
+
+                $mform->addElement('selectyesno', 'config_addidnumber',
+                        get_string('addidnumber', 'block_glossary_export_to_quiz'));
+                $mform->addHelpButton('config_addidnumber', 'addidnumber', 'block_glossary_export_to_quiz');
 
                 // And select question types to put in dropdown box.
                 $strquestiontypes = [
@@ -170,8 +174,9 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     $strquestiontypes[6] = get_string('wordle', 'qtype_guessit');
                 };
                 $mform->addElement('select', 'config_questiontype',
-                    get_string('selectquestiontype', 'quiz'), $strquestiontypes);
+                    get_string('selectquestiontype', 'block_glossary_export_to_quiz'), $strquestiontypes);
                 $mform->setDefault('config_questiontype', 0);
+                $mform->addHelpButton('config_questiontype', 'selectquestiontype', 'block_glossary_export_to_quiz');
                 $mform->hideIf('config_questiontype', 'config_glossary', 'eq', 0);
 
                 $nbchoices = [
@@ -304,11 +309,6 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->setDefault('config_maskconceptindefinitions', 1);
                 $mform->hideIf('config_maskconceptindefinitions', 'config_glossary', 'eq', 0);
 
-                $mform->addElement('selectyesno', 'config_addidnumber',
-                get_string('addidnumber', 'block_glossary_export_to_quiz'));
-                $mform->addHelpButton('config_addidnumber', 'addidnumber',
-                    'block_glossary_export_to_quiz');
-                $mform->setDefault('config_addidnumber', 1);
             }
         }
     }
@@ -321,6 +321,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
      * @return array $errors
      */
     public function validation($data, $files) {
+        // TODO add here validation for the limitnum field must be numeric
         global $DB;
         $errors = [];
         if (!isset($data['config_glossary'])) {
@@ -331,6 +332,10 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
             return;
         }
         $errors = parent::validation($data, $files);
+        if (!is_numeric($data['config_limitnum'])) {
+            $errors['config_limitnum'] = get_string('validnumber', 'block_glossary_export_to_quiz');
+        }
+        return $errors; 
         $glossary = explode(",", $glossaryid);
         $glossaryid = $glossary[0];
         $categoryid = $glossary[1];
@@ -341,6 +346,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         } else {
             $maxentries = $glossarynumentries;
         }
+        /*
         if ($questiontype == 6) {
             // todo use a glossary sql to count entris with concepts within wordle settings
             $conceptmaxlength = $data['config_nbmaxletterswordle'];
@@ -362,7 +368,8 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                $errors['config_limitnum'] = "impossible because $glossarynumentries < $maxentries";
            }
            */
-        } else if ($questiontype > 1) {
+        /*} else */
+        if ($questiontype > 1) {
             $data['config_nbchoices'] += $data['config_extrawronganswer'];
             $nbchoices = $data['config_nbchoices'];
             if ($questiontype > 1) { // Multichoice / matching / draganddrop.

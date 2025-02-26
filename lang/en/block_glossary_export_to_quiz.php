@@ -22,8 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['addidnumber'] = 'Add category and questions ID NUMBER';
-$string['addidnumber_help'] = 'Help for Add category and questions ID NUMBER';
+$string['addidnumber'] = 'Add IDNUMBER';
+$string['addidnumber_help'] = 'Add an IDNUMBER based on the Glossary name to the exported category and use the questions number to add their IDNUMBER.';
 $string['allentries'] = 'All entries';
 $string['clicktoexport'] = 'Click to export this glossary\'s entries to quiz (XML)';
 $string['concept'] = 'Alphabetical order';
@@ -70,8 +70,11 @@ $string['selectglossary'] = 'Select glossary to export from';
 $string['selectglossary_help'] = 'Use the dropdown list to select the glossary that you want to use to export its entries to the quiz questions bank.
 If that glossary contains categories, you can select only one category to export its entries.
 To cancel your choice or to reset the block, simply leave the dropdown list on the Choose... position.';
+$string['selectquestiontype'] = 'Select question type';
+$string['selectquestiontype_help'] = 'You can use the Moodle default question types: Short answer, Multiplechoice, Matching and Drag and Drop into text. If they are installed on your site you can also use Gapfill and Guess It (Wordle Guess a word).';
 $string['shuffleanswers'] = 'Shuffle answers';
 $string['shuffleanswers_help'] = 'If enabled, the order of the choices/answers is randomly shuffled for each attempt.';
 $string['sortingorder'] = 'Sorting Order';
 $string['sortingorder_help'] = 'Use this setting to determine how the exported glossary entries will be ordered when you import them to your questions data bank.
 This can be used, in combination with the Maximum number of entries, for creating a quiz to test the latest entries to your glossary (especially a fairly large one). ';
+$string['validnumber'] = 'Enter a valid number';

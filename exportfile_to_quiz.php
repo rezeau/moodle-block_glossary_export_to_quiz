@@ -44,6 +44,7 @@ $shuffleanswers = optional_param('shuffleanswers', '', PARAM_ALPHANUM);
 $answerdisplay = optional_param('answerdisplay', '', PARAM_ALPHANUM);
 $numquestions = optional_param('numquestions', '', PARAM_ALPHANUM);
 $sortorder = optional_param('sortorder', 0, PARAM_ALPHANUM);
+$addidnumber = optional_param('addidnumber', 0, PARAM_ALPHANUM);
 $entriescount = optional_param('entriescount', 0, PARAM_ALPHANUM);
 $questiontype = optional_param('questiontype', 0, PARAM_ALPHANUMEXT);
 $exportmediafiles = optional_param('exportmediafiles', '', PARAM_ALPHANUM);
@@ -107,13 +108,13 @@ if ($cat) {
     $catwhere = "and ge.id = c.entryid and c.categoryid = $cat";
 }
 
-    $sql = "SELECT ge.id, ge.concept, ge.definition "
-        ." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
-        . "WHERE ge.glossaryid = $glossaryid "
-        . "AND ge.approved = 1 "
-        . "$catwhere "
-        . "$sortorder "
-        . "$limit";
+$sql = "SELECT ge.id, ge.concept, ge.definition "
+    ." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
+    . "WHERE ge.glossaryid = $glossaryid "
+    . "AND ge.approved = 1 "
+    . "$catwhere "
+    . "$sortorder "
+    . "$limit";
 
 // Build XML file - based on moodle/question/xml/format.php.
 // Add opening tag.
@@ -139,7 +140,7 @@ switch ($questiontype) {
         $questiontypeabbr = ' GAPFILL';
         break;
     case 'guessit':
-        $questiontypeabbr = ' GUESSIT_WORDLE';
+        $questiontypeabbr = ' WORDLE';
         break;
 }
 
@@ -148,12 +149,17 @@ $filename = clean_filename(format_string($giftcategoryname, true).' questions.xm
 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
 
 $categorypath = writetext( $giftcategoryname );
+$categoryidnumber = '';
+if ($addidnumber) {
+    $categoryidnumber = str_replace(" ", "_", $giftcategoryname);
+}
 $expout .= "  <question type=\"category\">\n";
 $expout .= "    <category>\n";
 $expout .= "        $categorypath\n";
 $expout .= "    </category>\n";
+$expout .= "    <idnumber>$categoryidnumber</idnumber>\n";
 $expout .= "  </question>\n";
-$context = context_module::instance($cm->id);
+///$context = context_module::instance($cm->id);
 
 if ( $entries = $DB->get_records_sql($sql) ) {
     $instructions = '';
@@ -187,7 +193,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             if ($subquestionscounter == $nbchoices) {
                 $subquestionscounter = 0;
                 // Close the question tag.
-                $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
+                $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
                 $expout .= "</question>\n";
             }
             if ($subquestionscounter === 0) { // Start new matching question.
@@ -221,7 +227,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $subquestionscounter++;
         }
         // Close the last question tag.
-        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
+        $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
         $expout .= "</question>\n";
     } else if ($questiontype == 'ddwtos') {
         $choicescounter = 0;
@@ -241,7 +247,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     $expout .= writetext($dragboxconcept[$j], $nbchoices);
                     $expout .= "      </dragbox>\n";
                 }
-                $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
+                $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
                 $expout .= "</question>\n";
             }
             if ($choicescounter == 0) { // Start a new ddwtos question.
@@ -280,7 +286,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $expout .= writetext($dragboxconcept[$j], $nbchoices);
             $expout .= "      </dragbox>\n";
         }
-        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
+        $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
         $expout .= "</question>\n";
 
     } else if ($questiontype == 'gapfill') {
@@ -309,7 +315,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     $expout .= writetext($dragboxconcept[$j], $nbchoices);
                     $expout .= "      </answer>\n";
                 }
-                $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
+                $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
                 $expout .= "</question>\n";
             }
             if ($choicescounter == 0) { // Start a new question.
@@ -355,7 +361,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             $expout .= writetext($dragboxconcept[$j], $nbchoices);
             $expout .= "      </answer>\n";
         }
-        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
+        $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
         $expout .= "</question>\n";
 
     } else {
@@ -365,7 +371,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
             ///$nbmaxletterswordle = 5;
             if ($questiontype == 'multichoice' || $questiontype == 'shortanswer'
                 || ($questiontype == 'guessit' && str_word_count($concept) == 1
-                && strlen($concept) > 4 && strlen($concept) <= $nbmaxletterswordle ) ) {
+                    && strlen($concept) > 4 && strlen($concept) <= $nbmaxletterswordle ) ) {
                 $questionscounter++;
                 $definition = strip_text($entry->definition, $concept, $maskconceptindefinitions, $exportmediafiles);
                 $expout .= "\n\n<!-- question: $questionscounter  -->\n";
@@ -377,7 +383,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                 if ($questiontype == 'guessit') {
                     $definition .= '<br>'; 
                 }
-                $expout .= writetext($definition, 0);
+                $expout .= writetext($definition, 4)."\n";
                 
                 if ($exportmediafiles) {
                     $fs = get_file_storage();
@@ -419,7 +425,7 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                                 $expout .= "    </answer>\n";
                             }
                         }
-                        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
+                        $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
                         $expout .= "</question>\n";
                         break;
                     case 'shortanswer':
@@ -428,8 +434,10 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                         $expout .= "    <answer fraction=\"$percent\">\n";
                         $expout .= writetext( $concept, 3, false );
                         $expout .= "    </answer>\n";
-                        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
-                        $expout .= "</question>\n";
+                        if ($addidnumber) {
+                            $expout .= "    <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
+                        }
+                        $expout .= "  </question>\n";
                         break;
 
                     case 'guessit':  
@@ -437,19 +445,19 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                         $defaultgrade = strlen($concept);
                         $penalty = '0';
                         $gapsizedisplay = 'gapsizegrow';
-                        $nbtriesbeforehelp = '6';
-                        $nbmaxtrieswordle = '6';
                         $removespecificfeedback = '0';
                         $expout .= "    <defaultgrade>$defaultgrade</defaultgrade>\n ";
-                        $expout .= "    <penalty>$penalty</penalty>\n ";
-                        $expout .= "    <guessitgaps>" . $concept . "</guessitgaps>\n ";
-                        $expout .= "    <gapsizedisplay>$gapsizedisplay</gapsizedisplay>\n ";
-                        $expout .= "    <nbtriesbeforehelp>$nbtriesbeforehelp</nbtriesbeforehelp>\n ";
-                        $expout .= "    <nbmaxtrieswordle>$nbmaxtrieswordle</nbmaxtrieswordle>\n ";
-                        $expout .= "    <removespecificfeedback>$removespecificfeedback</removespecificfeedback>\n ";
-                        $expout .= "    <wordle>1</wordle>\n ";
-                        $expout .= "<idnumber>" . $questionscounter . "</idnumber>\n";
-                        $expout .= "</question>\n";
+                        $expout .= "   <penalty>$penalty</penalty>\n ";
+                        $expout .= "   <guessitgaps>" . $concept . "</guessitgaps>\n ";
+                        $expout .= "   <gapsizedisplay>$gapsizedisplay</gapsizedisplay>\n ";
+                        $expout .= "   <nbtriesbeforehelp>$nbtriesbeforehelp</nbtriesbeforehelp>\n ";
+                        $expout .= "   <nbmaxtrieswordle>$nbmaxtrieswordle</nbmaxtrieswordle>\n ";
+                        $expout .= "   <removespecificfeedback>$removespecificfeedback</removespecificfeedback>\n ";
+                        $expout .= "   <wordle>1</wordle>\n ";
+                        if ($addidnumber) {
+                            $expout .= "   <idnumber>" . sprintf("%02d", $questionscounter) . "</idnumber>\n";
+                        }
+                        $expout .= "  </question>\n";
                         break;
                 }
            }
