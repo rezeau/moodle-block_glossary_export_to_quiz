@@ -91,6 +91,7 @@ class block_glossary_export_to_quiz extends block_base {
         global $USER, $CFG, $DB, $SESSION;
         $editing = $this->page->user_is_editing();
         $this->content = new stdClass();
+        $qtype = $this->config->questiontype;
         // Set view block permission to course:mod/glossary:export to prevent students etc to view this block.
         $course = $this->page->course;
         $context = context_course::instance($course->id);
@@ -134,6 +135,11 @@ class block_glossary_export_to_quiz extends block_base {
         $glossaryid = $categories[0];
         $entriescount = 0;
         $numentries = 0;
+        $guessitwhere = '';
+        if ($qtype == 6) { // Guessit.
+            $nbmaxletterswordle = $this->config->nbmaxletterswordle + 1;
+            $guessitwhere = "AND LENGTH(ge.concept) > 3 AND LENGTH(ge.concept) < $nbmaxletterswordle AND ge.concept NOT LIKE '% %'";
+        }
         if (isset ($categories[1]) && $categories[1] != 0) {
             $categoryid = $categories[1];
             $category = $DB->get_record('glossary_categories', ['id' => $categoryid]);
@@ -141,19 +147,26 @@ class block_glossary_export_to_quiz extends block_base {
                 ." FROM mdl_glossary_entries ge , mdl_glossary_entries_categories c "
                 . " WHERE ge.glossaryid = $glossaryid "
                 . " AND ge.approved = 1 AND ge.id = c.entryid "
-                . " AND c.categoryid = $categoryid";
-            $entriescount = $DB->count_records_sql($sql);
+                . " AND c.categoryid = $categoryid "
+                . " $guessitwhere ";
+                ///echo $sql;die;
+            $entriescount = $DB->count_records_sql($sql);            
             $categoryname = '<b>'.get_string('category', 'glossary').'</b>: <em>'.
                 $category->name.'</em>';
         } else {
             $categoryid = '';
-            $entriescount = $DB->count_records("glossary_entries", ['glossaryid' => $glossaryid]);
+            $sql = "SELECT COUNT(*) "
+                ." FROM mdl_glossary_entries ge , mdl_glossary_entries_categories c "
+                . " WHERE ge.glossaryid = $glossaryid "
+                . " AND ge.approved = 1 AND ge.id = c.entryid "
+                . " $guessitwhere ";
+            $entriescount = $DB->count_records_sql($sql);
             $categoryname = '<b>'.get_string('category', 'glossary').'</b>: '.
                 get_string('allentries', 'block_glossary_export_to_quiz');
         }
         $limitnum = $this->config->limitnum;
 
-        $qtype = $this->config->questiontype;
+        
         // Initialize options.
         $usecase = '';
         $nbmaxtrieswordle = '';
@@ -217,12 +230,12 @@ class block_glossary_export_to_quiz extends block_base {
             $numquestions = $numentries;
         }
         // For all question types except guessit where final number of questions created is unknown.
-        if ($qtype < 6) {
+        ///if ($qtype < 6) {
             $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz',
                 $numentries).get_string('numquestions', 'block_glossary_export_to_quiz', $numquestions);
-        } else {
-            $strnumentries = '<br />'.get_string('exporttoquessit', 'block_glossary_export_to_quiz');
-        }
+        ///} else {
+        ///    $strnumentries = '<br />'.get_string('exporttoquessit', 'block_glossary_export_to_quiz');
+        ///}
 
         $sortorder = $this->config->sortingorder;
         $type[0] = get_string('concept', 'block_glossary_export_to_quiz');
@@ -271,7 +284,7 @@ class block_glossary_export_to_quiz extends block_base {
         $title = get_string('clicktoexport', 'block_glossary_export_to_quiz');
         $strglossary = get_string('currentglossary', 'glossary');
 
-        $this->content->text   = '<b>'.$strglossary.'</b>: '.$glosssaryname.'<br />'.$categoryname.'<br />'.
+        $this->content->text = '<b>'.$strglossary.'</b>: '.$glosssaryname.'<br />'.$categoryname.'<br />'.
             $strsortorder. '<br />'.$strquestiontype;
         $this->content->footer = '<a title="'.$title.'" href='
             .$CFG->wwwroot.'/blocks/glossary_export_to_quiz/export_to_quiz.php?id='

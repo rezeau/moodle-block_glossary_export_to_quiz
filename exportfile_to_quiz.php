@@ -132,6 +132,10 @@ if ($questiontype == 'guessit') {
     . "$sortorder "
     . "$limit";
     $numquestions = $DB->count_records_sql($sqlcount);
+    if ($limitnum) {
+        $numquestions = min($limitnum, $numquestions);
+        $limitnum = $numentries;
+    }
 }
 
 // Build XML file - based on moodle/question/xml/format.php.
