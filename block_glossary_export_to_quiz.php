@@ -149,24 +149,23 @@ class block_glossary_export_to_quiz extends block_base {
                 . " AND ge.approved = 1 AND ge.id = c.entryid "
                 . " AND c.categoryid = $categoryid "
                 . " $guessitwhere ";
-                ///echo $sql;die;
-            $entriescount = $DB->count_records_sql($sql);            
+            $entriescount = $DB->count_records_sql($sql);
             $categoryname = '<b>'.get_string('category', 'glossary').'</b>: <em>'.
                 $category->name.'</em>';
         } else {
             $categoryid = '';
             $sql = "SELECT COUNT(*) "
-                ." FROM mdl_glossary_entries ge , mdl_glossary_entries_categories c "
+                ." FROM mdl_glossary_entries ge "
                 . " WHERE ge.glossaryid = $glossaryid "
-                . " AND ge.approved = 1 AND ge.id = c.entryid "
+                . " AND ge.approved = 1 "
                 . " $guessitwhere ";
+
             $entriescount = $DB->count_records_sql($sql);
             $categoryname = '<b>'.get_string('category', 'glossary').'</b>: '.
                 get_string('allentries', 'block_glossary_export_to_quiz');
         }
         $limitnum = $this->config->limitnum;
 
-        
         // Initialize options.
         $usecase = '';
         $nbmaxtrieswordle = '';
@@ -214,7 +213,6 @@ class block_glossary_export_to_quiz extends block_base {
                 $nbmaxletterswordle = $this->config->nbmaxletterswordle;
             break;
         }
-
         if ($limitnum) {
             $numentries = min($limitnum, $entriescount);
             $limitnum = $numentries;
@@ -229,14 +227,8 @@ class block_glossary_export_to_quiz extends block_base {
         } else {
             $numquestions = $numentries;
         }
-        // For all question types except guessit where final number of questions created is unknown.
-        ///if ($qtype < 6) {
-            $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz',
-                $numentries).get_string('numquestions', 'block_glossary_export_to_quiz', $numquestions);
-        ///} else {
-        ///    $strnumentries = '<br />'.get_string('exporttoquessit', 'block_glossary_export_to_quiz');
-        ///}
-
+        $strnumentries = '<br />'.get_string('numentries', 'block_glossary_export_to_quiz',
+            $numentries).get_string('numquestions', 'block_glossary_export_to_quiz', $numquestions);
         $sortorder = $this->config->sortingorder;
         $type[0] = get_string('concept', 'block_glossary_export_to_quiz');
         $type[1] = get_string('lastmodified', 'block_glossary_export_to_quiz');

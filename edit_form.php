@@ -103,8 +103,8 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                            ." FROM mdl_glossary_entries ge WHERE ge.glossaryid = $key "
                            ." AND ge.approved = 1 AND ge.concept NOT LIKE '% %' "
                            ." AND LENGTH(ge.concept) < 6";
-                       $numentries = $DB->count_records_sql($sql);
-                       
+                        $numentries = $DB->count_records_sql($sql);
+
                     }
                 }
             }
@@ -166,7 +166,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     $gapfillinstalled = true;
                     $strquestiontypes[5] = get_string('pluginname', 'qtype_gapfill');
                 };
-                /// FEBRUARY 2025 add guessit q_type.                
+                // FEBRUARY 2025 add guessit q_type.
                 $guessitinstalled = false;
                 $createabletypes = question_bank::get_creatable_qtypes();
                 if (array_key_exists('guessit', $createabletypes)) {
@@ -230,7 +230,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                     $mform->addHelpButton('config_nbmaxtrieswordle', 'nbmaxtrieswordle', 'qtype_guessit');
                     $mform->setDefault('config_nbmaxtrieswordle', 10);
                     $mform->hideIf('config_nbmaxtrieswordle', 'config_questiontype', 'neq', 6);
-                    
+
                     // Maximum number of letters in concepts/worddle words.
                     $mform->addElement('select', 'config_nbmaxletterswordle',
                             get_string('nbmaxletterswordle', 'block_glossary_export_to_quiz'), $nbmaxletterswordle);
@@ -321,7 +321,6 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
      * @return array $errors
      */
     public function validation($data, $files) {
-        // TODO add here validation for the limitnum field must be numeric
         global $DB;
         $errors = [];
         if (!isset($data['config_glossary'])) {
@@ -334,8 +333,8 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         $errors = parent::validation($data, $files);
         if (!is_numeric($data['config_limitnum'])) {
             $errors['config_limitnum'] = get_string('validnumber', 'block_glossary_export_to_quiz');
+            return $errors;
         }
-        return $errors; 
         $glossary = explode(",", $glossaryid);
         $glossaryid = $glossary[0];
         $categoryid = $glossary[1];
@@ -346,30 +345,18 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
         } else {
             $maxentries = $glossarynumentries;
         }
-        /*
         if ($questiontype == 6) {
-            // todo use a glossary sql to count entris with concepts within wordle settings
             $conceptmaxlength = $data['config_nbmaxletterswordle'];
             $sql = "SELECT COUNT(*) "
                 ." FROM mdl_glossary_entries ge WHERE ge.glossaryid = $glossaryid "
                 ." AND ge.approved = 1 AND ge.concept NOT LIKE '% %' "
-                ." AND LENGTH(ge.concept) < $conceptmaxlength";
-           /*
-           $errors['config_limitnum'] = "sql = $sql";
-           return $errors;
-           $glossarynumentriesforwordle = $DB->count_records_sql($sql);
-           if ($glossarynumentriesforwordle < $maxentries) {
-               $errors['config_limitnum'] = "glossarynumentriesforwordle = $glossarynumentriesforwordle";
-               return $errors;
-           }
-           */
-           /*
-           if ($glossarynumentries < $maxentries) {
-               $errors['config_limitnum'] = "impossible because $glossarynumentries < $maxentries";
-           }
-           */
-        /*} else */
-        if ($questiontype > 1) {
+                ." AND LENGTH(ge.concept) <= $conceptmaxlength";
+                $numentriesforwordle = $DB->count_records_sql($sql);
+            if ($numentriesforwordle === 0) {
+                $errormsg = 'notenoughentriesavailableforwordle';
+                $errors['config_nbmaxletterswordle'] = get_string($errormsg, 'block_glossary_export_to_quiz', $conceptmaxlength);
+            }
+        } else if ($questiontype > 1) {
             $data['config_nbchoices'] += $data['config_extrawronganswer'];
             $nbchoices = $data['config_nbchoices'];
             if ($questiontype > 1) { // Multichoice / matching / draganddrop.
@@ -387,11 +374,6 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 }
             }
         }
-        if ($maxentries > $glossarynumentries) {
-            $errors['config_limitnum'] = '<b>'.get_string('warning', 'moodle').'</b>: '
-                .get_string('limitnum', 'block_glossary_export_to_quiz').' ('.$maxentries.') > '
-                .get_string('numberofentries', 'glossary').' ('.$glossarynumentries.') !';
-        }        
         return $errors;
     }
 }
