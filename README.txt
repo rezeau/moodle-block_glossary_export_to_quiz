@@ -1,5 +1,7 @@
 Release notes
 --------------------------------
+Version 5.1 Fixed retain text inside links
+
 Version 5.0 Added Guessit:wordle question type
 
 Version 4.0 release 2024042700 for Moodle 4.4+
