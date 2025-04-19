@@ -546,6 +546,7 @@ function write_files($files) {
 /**
  * Remove all links, paragraph, line break, horizontal line and div tags from string
  * except paragraphs containing an image 19 APRIL 2020.
+ * BUT in links, keep the text 19 APRIL 2025
  * @param string $text
  * @param string $concept
  * @param string $maskconceptindefinitions
@@ -554,7 +555,7 @@ function write_files($files) {
  * @package block_glossary_export_to_quiz
  */
 function strip_text ($text, $concept, $maskconceptindefinitions, $exportmediafiles) {
-    $pattern = '/(<p[^>]*>|<\/p>|<div[^>]*>|<\/div>|<[bh]r ?\/?>|<a.*<\/a>)/';
+    $pattern = '/<\/?a[^>]*>|<\/?p[^>]*>|<\/?div[^>]*>|<[bh]r\s*\/?>/';
     $text = preg_replace ($pattern, ' ', $text);
 
     // Find images in text (if any).
