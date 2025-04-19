@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025031200;
+$plugin->version   = 2025041900;
 $plugin->requires  = 2023100900;
 $plugin->component = 'block_glossary_export_to_quiz';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.5';
+$plugin->release = '5.1';
