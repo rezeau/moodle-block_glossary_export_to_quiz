@@ -138,7 +138,8 @@ class block_glossary_export_to_quiz extends block_base {
         $guessitwhere = '';
         if ($qtype == 6) { // Guessit.
             $nbmaxletterswordle = $this->config->nbmaxletterswordle + 1;
-            $guessitwhere = "AND LENGTH(ge.concept) > 3 AND LENGTH(ge.concept) < $nbmaxletterswordle AND ge.concept NOT LIKE '% %'";
+            $guessitwhere = "AND char_length(ge.concept) > 3 AND char_length(ge.concept)
+            < $nbmaxletterswordle AND ge.concept NOT LIKE '% %'";
         }
         if (isset ($categories[1]) && $categories[1] != 0) {
             $categoryid = $categories[1];

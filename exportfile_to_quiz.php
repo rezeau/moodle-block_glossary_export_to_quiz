@@ -111,7 +111,8 @@ if ($cat) {
 }
 if ($questiontype == 'guessit') {
     $nbmaxletterswordle = $nbmaxletterswordle + 1;
-    $guessitwhere = "AND LENGTH(ge.concept) > 3 AND LENGTH(ge.concept) < $nbmaxletterswordle AND ge.concept NOT LIKE '% %'";
+    $guessitwhere = "AND char_length(ge.concept) > 3 AND char_length(ge.concept)"
+        ." < $nbmaxletterswordle AND ge.concept NOT LIKE '% %'";
 }
 $sql = "SELECT ge.id, ge.concept, ge.definition "
     ." FROM ".$CFG->prefix."glossary_entries ge $catfrom "
@@ -447,7 +448,14 @@ if ( $entries = $DB->get_records_sql($sql) ) {
                     break;
 
                 case 'guessit':
-                    $concept = strtoupper($concept);
+                    // Deal with words with diactritics.
+                    // Normalize the string (requires intl extension).
+                    $string = $concept;
+                    $normalized = Normalizer::normalize($string, Normalizer::FORM_D);
+                    // Remove diacritical marks using regex.
+                    $withoutaccents = preg_replace('/\p{Mn}/u', '', $normalized);
+                    // Convert to uppercase (multibyte-safe).
+                    $concept = mb_strtoupper($withoutaccents, 'UTF-8');
                     $defaultgrade = strlen($concept);
                     $penalty = '0';
                     $expout .= "    <defaultgrade>$defaultgrade</defaultgrade>\n ";
@@ -575,9 +583,9 @@ function strip_text ($text, $concept, $maskconceptindefinitions, $exportmediafil
 
     // If replace concept string in definition with asterisks ***.
     // Do NOT replace within image link !!!
-    // Only replace if full word, not part of word. 27/04/2024.
+    // Replace concept even if part of word (reversion from 27/04/2024 on 10/05/2025).
     if ($maskconceptindefinitions) {
-        $pattern = '/\b' . preg_quote($concept, '/') . '\b(?![[:punct:]])|(?<![[:punct:]])\b' . preg_quote($concept, '/') . '\b/i';
+        $pattern = '/' . preg_quote($concept, '/') . '\b(?![[:punct:]])|(?<![[:punct:]])\b' . preg_quote($concept, '/') . '/i';
         $replacement = '***';
         $text = preg_replace($pattern, $replacement, $text);
     }

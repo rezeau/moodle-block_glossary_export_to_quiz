@@ -102,7 +102,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                         $sql = "SELECT COUNT(*) "
                            ." FROM mdl_glossary_entries ge WHERE ge.glossaryid = $key "
                            ." AND ge.approved = 1 AND ge.concept NOT LIKE '% %' "
-                           ." AND LENGTH(ge.concept) < 6";
+                           ." AND char_length(ge.concept) < 6";
                         $numentries = $DB->count_records_sql($sql);
 
                     }
@@ -142,7 +142,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
                 $mform->addElement('text', 'config_limitnum',
                                 get_string('limitnum', 'block_glossary_export_to_quiz'), ['size' => 5]);
                 $mform->addHelpButton('config_limitnum', 'limitnum', 'block_glossary_export_to_quiz');
-                $mform->setDefault('config_limitnum', '');
+                $mform->setDefault('config_limitnum', "0");
                 $mform->setType('config_limitnum', PARAM_RAW);
                 $mform->hideIf('config_limitnum', 'config_glossary', 'eq', 0);
 
@@ -350,7 +350,7 @@ class block_glossary_export_to_quiz_edit_form extends block_edit_form {
             $sql = "SELECT COUNT(*) "
                 ." FROM mdl_glossary_entries ge WHERE ge.glossaryid = $glossaryid "
                 ." AND ge.approved = 1 AND ge.concept NOT LIKE '% %' "
-                ." AND LENGTH(ge.concept) <= $conceptmaxlength";
+                ." AND char_length(ge.concept) <= $conceptmaxlength";
                 $numentriesforwordle = $DB->count_records_sql($sql);
             if ($numentriesforwordle === 0) {
                 $errormsg = 'notenoughentriesavailableforwordle';
